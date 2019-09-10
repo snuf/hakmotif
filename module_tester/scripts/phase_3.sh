@@ -1,4 +1,9 @@
 #!/bin/bash -xe
+#
+#
+
+SECONDS=0
+. envfile
 
 if [ ! -d "/mnt/fio" ]; then
     mkdir /mnt/fio
@@ -37,4 +42,6 @@ fio \
     --bs=256k \
     $fio_defaults
 
-echo "PHASE 3 DONE" >> /var/log/fio_test.log
+delta=$SECONDS
+echo "PHASE 3 TIME: $delta" >> /var/log/fio_test.log
+

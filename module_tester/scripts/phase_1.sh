@@ -1,14 +1,15 @@
 #!/bin/bash
 #
-# Sets the host up for all things required to build, and install the module on the kernel in envfile
 #
+
+SECONDS=0
 . envfile
 
 export DEBIAN_FRONTEND=noninteractive
 apt install debconf-utils
 
-echo 'libssl1.0.0:amd64 libssl1.0.0/restart-services string' | sudo debconf-set-selections
-## stage_1
+echo 'libssl1.0.0:amd64 libssl1.0.0/restart-services string' | \
+    sudo debconf-set-selections
 if [ "$apt_proxy" != "" ]; then
     echo "Acquire::http::Proxy \"$apt_proxy\";" > /etc/apt/apt.conf.d/01proxy
 fi
@@ -41,4 +42,5 @@ if [ "$running_kernel" != "$kernel_branch" ]; then
     rm *-dbg*
     dpkg -i *.deb
 fi
-echo "PHASE 1 DONE" > /var/log/fio_test.log
+delta=$SECONDS
+echo "PHASE 1 TIME: $delta" > /var/log/fio_test.log

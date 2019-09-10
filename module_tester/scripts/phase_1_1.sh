@@ -1,5 +1,8 @@
 #!/bin/bash -xe
+#
+#
 
+SECONDS=0
 . envfile
 
 if [ ! -d "iomemory-vsl" ]; then
@@ -24,4 +27,5 @@ else
     exit 1
 fi
 
-echo "PHASE 1.1 DONE" >> /var/log/fio_test.log
+delta=$SECONDS
+echo "PHASE 1.1 TIME: $delta" >> /var/log/fio_test.log

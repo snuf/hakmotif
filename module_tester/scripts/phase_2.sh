@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 #
+
+SECONDS=0
 . envfile
 
 # 00:04.0 Mass storage controller: SanDisk ioDimm3 (rev 01)
@@ -45,4 +47,6 @@ else
 fi
 mount /dev/${dev}1 /mnt
 
-echo "PHASE 2 DONE" >> /var/log/fio_test.log
+delta=$SECONDS
+echo "PHASE 2 TIME: $delta" >> /var/log/fio_test.log
+
