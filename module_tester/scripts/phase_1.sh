@@ -37,6 +37,11 @@ cps3() {
 
 running_kernel=$(uname -r)
 if [ "$running_kernel" != "$kernel_branch" ]; then
+    echo $kernel_branch | grep rc
+    if [ "$?" == "0" ]; then
+        kernel_branch=$(echo $kernel_branch | perl -ne '/(\d+.\d+)(-rc\d+)/; print $1.".0$2"')
+    fi
+
     cps3 s3/$pkg_loc linux-image-${kernel_branch} .
     cps3 s3/$pkg_loc linux-headers-${kernel_branch} .
     rm *-dbg*
