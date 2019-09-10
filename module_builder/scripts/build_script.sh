@@ -18,6 +18,11 @@ if [ ! "$kernel_branch" ]; then
   $kernel_branch=$(echo $kernel_hdrs | perl -ne '/([\d\.]+(\-\d+)?)/; print $1')
 fi
 
+echo $kernel_branch | grep rc
+if [ "$?" == "0" ]; then
+    kernel_branch=$(echo $kernel_branch | perl -ne '/(\d+.\d+)(-rc\d+)/; print $1.".0$2"')
+fi
+
 src_hdr=$(ls -1 /usr/src | grep $kernel_branch)
 deb_kernel_version=$kernel_branch \
   KERNEL_SRC=/usr/src/$src_hdr \

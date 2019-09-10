@@ -3,15 +3,14 @@
 set -x
 
 kb() {
-  if [[ $kernel_branch =~ -rc\d+ ]]; then
-    echo $kernel_branch | sed -e s/-rc/.0-rc/
+  if [[ $kernel_branch =~ .*rc.* ]]; then
+    mm=$(echo $kernel_branch | perl -ne '/(\d+.\d+)(-rc\d+)/; print $1.".0$2"')
   elif [[ $kernel_branch =~ linux-.*.y$ ]]; then
-   # need to rethink for this scenario...
-   mm=$(echo $kernel_branch | sed -e s/linux-//)
-   echo $mm
+    mm=$(echo $kernel_branch | sed -e s/linux-//)$
   else
-   echo $kernel_branch
- fi
+    mm=$kernel_branch
+  fi
+  echo $mm
 }
 
 # some distributions do multiple part headers
