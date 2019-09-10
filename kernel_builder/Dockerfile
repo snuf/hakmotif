@@ -5,15 +5,15 @@ MAINTAINER funs@barred.org
 ARG apt_proxy
 
 USER root
-RUN if $apt_proxy; then \
-  echo "Acquire::http::Proxy \"$apt_proxy\";" > /etc/apt/apt.conf; \
+RUN if [ "$apt_proxy" ]; then \
+  echo "Acquire::http::Proxy \"$apt_proxy\";" > /etc/apt/apt.conf.d/01proxy; \
   fi 
-RUN apt-get update
+RUN apt-get update && apt-get -y upgrade
 RUN apt-get install -y sudo
 RUN sudo apt-get install -y gcc \
   git make fakeroot build-essential \
   debhelper libelf-dev libssl-dev \
-  bc bison flex kmod cpio
+  bc bison flex kmod cpio rsync
 # perf
 RUN apt-get -y install libunwind-dev systemtap-sdt-dev libperl-dev \
   libnuma-dev liblzma-dev libbabeltrace-ctf-dev libiberty-dev \
