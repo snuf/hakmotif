@@ -1,0 +1,22 @@
+# s3 details for minio client
+MC_ENDPOINT=
+MC_ACCESS=
+MC_SECRET=
+MC_APIVER=s3v4
+
+# apt proxy
+apt_proxy=
+
+# details
+iomemory_branch=next_generation
+kernel_branch=4.16-rc2
+subs=debian
+
+# S3 locations in the bucket
+pkg_loc=kernel
+config_loc=config
+source_loc=sources
+
+kernel_src_tgz=linux-stable.tgz
+kernel_hdrs=
+kernel_cfg=
