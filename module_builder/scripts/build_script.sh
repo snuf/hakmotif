@@ -2,18 +2,6 @@
 
 set -x
 
-kb() {
-  if [[ $kernel_branch =~ .*rc.* ]]; then
-    mm=$(echo $kernel_branch | perl -ne '/(\d+.\d+)(-rc\d+)/; print $1.".0$2"')
-  elif [[ $kernel_branch =~ linux-.*.y$ ]]; then
-    mm=$(echo $kernel_branch | sed -e s/linux-//)$
-  else
-    mm=$kernel_branch
-  fi
-  echo $mm
-}
-
-#
 git clone https://github.com/snuf/iomemory-vsl
 cd iomemory-vsl
 git checkout $module_branch

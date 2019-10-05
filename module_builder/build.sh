@@ -7,7 +7,7 @@ if [ "$ver" == "" ]; then
   ver=$(basename $(pwd))
 fi
 
-file=Dockerfile.ubuntu
+file=Dockerfile.ubuntu.test
 docker build -t $ver -f $file . $OPTS
 
 # for file in $(ls -1 Dockerfile.*); do
