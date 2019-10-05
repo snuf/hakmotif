@@ -1,6 +1,18 @@
 #!/bin/bash
 
 set -x
+
+kb() {
+  if [[ $kernel_branch =~ .*rc.* ]]; then
+    mm=$(echo $kernel_branch | perl -ne '/(\d+.\d+)(-rc\d+)/; print $1.".0$2"')
+  elif [[ $kernel_branch =~ linux-.*.y$ ]]; then
+    mm=$(echo $kernel_branch | sed -e s/linux-//)$
+  else
+    mm=$kernel_branch
+  fi
+  echo $mm
+}
+
 #
 git clone https://github.com/snuf/iomemory-vsl
 cd iomemory-vsl
@@ -14,13 +26,13 @@ if [ "$cheat_build_file_finder" == "1" ]; then
   cd ..
 fi
 # kernel version, headers and branch will be the same
-if [ ! "$kernel_branch" ]; then
+if [ "$kernel_branch" != "" ]; then
+    echo $kernel_branch | grep rc
+    if [ "$?" == "0" ]; then
+        kernel_branch=$(echo $kernel_branch | perl -ne '/(\d+.\d+)(-rc\d+)/; print $1.".0$2"')
+    fi
+else
   $kernel_branch=$(echo $kernel_hdrs | perl -ne '/([\d\.]+(\-\d+)?)/; print $1')
-fi
-
-echo $kernel_branch | grep rc
-if [ "$?" == "0" ]; then
-    kernel_branch=$(echo $kernel_branch | perl -ne '/(\d+.\d+)(-rc\d+)/; print $1.".0$2"')
 fi
 
 src_hdr=$(ls -1 /usr/src | grep $kernel_branch)
