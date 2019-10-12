@@ -35,18 +35,21 @@ if [ "$?" != "0" ]; then
     echo "no partition found on ${dev}1, creating"
     parted -s /dev/$dev mklabel gpt
     parted -s /dev/$dev mkpart primary 1 100%
-    lsblk | grep ${dev}1
+    mkfs.ext4 /dev/${dev}1
     if [ "$?" != "0" ]; then
-        mkfs.ext4 /dev/${dev}1
-    else
         echo "failed to create partiion, ${dev}1 not found"
         exit 1
     fi
 else
-    echo "partition found on ${dev}1, reusing"
+    echo "partition found on ${dev}1"
+    file -sL /dev/${dev}1 | grep ext4
+    if [ "$?" != "0" ]; then
+        echo "no ext4 found, formatting"
+        mkfs.ext4 /dev/${dev}1
+    fi
+
 fi
 mount /dev/${dev}1 /mnt
 
 delta=$SECONDS
 echo "PHASE 2 TIME: $delta" >> /var/log/fio_test.log
-

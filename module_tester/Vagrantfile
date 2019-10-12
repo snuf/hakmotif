@@ -1,8 +1,15 @@
 
 cpus = 8
 memory = 8192
-box = "generic/ubuntu1804"
+box = "generic/ubuntu1904"
 hostname = "fio.local"
+
+$proxy = <<-SHELL
+    proxy=#{ENV['APT_PROXY']}
+    if [ "$proxy" != "" ]; then
+      echo "Acquire::http::Proxy \\\"$proxy\\\";" > /etc/apt/apt.conf.d/01proxy
+    fi
+SHELL
 
 Vagrant.configure("2") do |config|
     config.vm.box = box
@@ -11,12 +18,16 @@ Vagrant.configure("2") do |config|
     config.vm.provider :libvirt do |lv, override|
         lv.cpus = cpus
         lv.memory = memory
+        lv.pci :bus => '0x0b', :slot => '0x00', :function => '0x0'
         lv.pci :bus => '0x0c', :slot => '0x00', :function => '0x0'
     end
+    config.vm.provision "shell", inline: $proxy, privileged: true
     config.vm.provision "file", source: "../envfile", destination: "envfile"
     config.vm.provision "shell", path: "scripts/phase_1.sh"
     config.vm.provision :reload
     config.vm.provision "shell", path: "scripts/phase_1_1.sh"
+    config.vm.provision "shell", path: "scripts/phase_1_2.sh"
     config.vm.provision "shell", path: "scripts/phase_2.sh"
     config.vm.provision "shell", path: "scripts/phase_3.sh"
+    config.vm.provision "shell", path: "scripts/phase_4.sh"
 end

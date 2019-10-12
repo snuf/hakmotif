@@ -27,7 +27,7 @@ src_hdr=$(ls -1 /usr/src | grep $kernel_branch)
 deb_kernel_version=$kernel_branch \
   KERNEL_SRC=/usr/src/$src_hdr \
   dpkg-buildpackage \
-  -rfakeroot -b --no-check-builddeps -us -uc
+  -rfakeroot -B --no-check-builddeps -us -uc
 
 ## Later also upload the simple .ko
 cd ../ && cp *.deb staging/ && cp *.changes staging/

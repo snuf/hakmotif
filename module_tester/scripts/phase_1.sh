@@ -18,7 +18,7 @@ apt-get install -y sudo
 apt-get install -y gcc make \
   git make fakeroot build-essential fio \
   debhelper libelf-dev python-pip rsync jq procps \
-  kexec-tools
+  kexec-tools alien
 
 apt -y autoremove && sudo apt -y clean
 curl -o /usr/local/bin/mc \
