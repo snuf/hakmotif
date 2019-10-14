@@ -10,4 +10,4 @@ dpkg-buildpackage \
   -rfakeroot --no-check-builddeps --no-sign
 
 delta=$SECONDS
-echo "PHASE 1.2 TIME: $delta" >> /var/log/fio_test.log
+echo "PHASE 1.3 TIME: $delta" >> /var/log/fio_test.log

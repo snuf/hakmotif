@@ -1,11 +1,13 @@
 #!/bin/bash -v
 #
-epoch=$(date +%s)
-export APT_PROXY=http://localhost:8080
-vagrant up --provision | tee -a $epoch
-delta=$(( $(date +%s) - $epoch ))
-echo "$0 - RUNTIME: ${delta}s" | tee -a $epoch
+SECONDS=0
+resultDir=results
+. envfile
 
-# vagrant destroy --force | tee -a $epoch
-delta=$(( $(date +%s) - $epoch )) 
-echo "$0 - DESTROYTIME: ${delta}s" | tee -a $epoch
+logFile=""
+
+vagrant up --provision | tee -a $start
+echo "$0 - RUNTIME: ${SECONDS}s" | tee -a $start
+
+# vagrant destroy --force | tee -a $start
+echo "$0 - DESTROYTIME: ${SECONDS}s" | tee -a $start
