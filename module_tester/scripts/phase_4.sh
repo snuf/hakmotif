@@ -1,6 +1,8 @@
 #!/bin/bash -xe
 #
 #
+echo "PHASE 4 START" >> /var/log/fio_test.log
+SECONDS=0
 umount /mnt
 rmmod iomemory-vsl.ko
 dmesg
@@ -10,3 +12,5 @@ if [ "$?" == "0" ]; then
 else
     exit 1
 fi
+delta=$SECONDS
+echo "PHASE 4 END: $delta" >> /var/log/fio_test.log

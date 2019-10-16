@@ -2,6 +2,7 @@
 #
 #
 
+echo "PHASE 1 START" > /var/log/fio_test.log
 SECONDS=0
 source envfile
 
@@ -48,4 +49,4 @@ if [ "$running_kernel" != "$kernel_branch" ]; then
     dpkg -i *.deb
 fi
 delta=$SECONDS
-echo "PHASE 1 TIME: $delta" > /var/log/fio_test.log
+echo "PHASE 1 END: $delta" >> /var/log/fio_test.log

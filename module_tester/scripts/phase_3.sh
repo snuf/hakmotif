@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 #
 #
-
+echo "PHASE 3 START" >> /var/log/fio_test.log
 SECONDS=0
 . envfile
 
@@ -43,5 +43,4 @@ fio \
     $fio_defaults
 
 delta=$SECONDS
-echo "PHASE 3 TIME: $delta" >> /var/log/fio_test.log
-
+echo "PHASE 3 END: $delta" >> /var/log/fio_test.log

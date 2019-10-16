@@ -1,13 +1,16 @@
 #!/bin/bash -v
 #
 SECONDS=0
-resultDir=results
-. envfile
+resultDir="results"
+. ../envfile
 
-logFile=""
+logFile="${resultDir}/$(date +%Y%m%d-%H%M%S)"
 
-vagrant up --provision | tee -a $start
-echo "$0 - RUNTIME: ${SECONDS}s" | tee -a $start
+if [ ! -d "$resultDir" ];then
+    mkdir $resultDir
+fi
+vagrant up --provision | tee -a $logFile
+echo "$0 - RUNTIME: ${SECONDS}s" | tee -a $logFile
 
 # vagrant destroy --force | tee -a $start
-echo "$0 - DESTROYTIME: ${SECONDS}s" | tee -a $start
+# echo "$0 - DESTROYTIME: ${SECONDS}s" | tee -a $

@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 #
 #
-
+echo "PHASE 2 START" >> /var/log/fio_test.log
 SECONDS=0
 . envfile
 
@@ -52,4 +52,4 @@ fi
 mount /dev/${dev}1 /mnt
 
 delta=$SECONDS
-echo "PHASE 2 TIME: $delta" >> /var/log/fio_test.log
+echo "PHASE 2 END: $delta" >> /var/log/fio_test.log

@@ -1,7 +1,7 @@
 #!/bin/bash -xe
 #
 #
-
+echo "PHASE 1.3 START" >> /var/log/fio_test.log
 SECONDS=0
 . envfile
 
@@ -10,4 +10,4 @@ dpkg-buildpackage \
   -rfakeroot --no-check-builddeps --no-sign
 
 delta=$SECONDS
-echo "PHASE 1.3 TIME: $delta" >> /var/log/fio_test.log
+echo "PHASE 1.3 END: $delta" >> /var/log/fio_test.log
