@@ -45,7 +45,9 @@ if [ "$running_kernel" != "$kernel_branch" ]; then
 
     cps3 s3/$pkg_loc linux-image-${kernel_branch} .
     cps3 s3/$pkg_loc linux-headers-${kernel_branch} .
+    set +e
     rm *-dbg*
+    set -e
     dpkg -i *.deb
 fi
 delta=$SECONDS
