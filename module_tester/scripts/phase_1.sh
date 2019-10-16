@@ -38,8 +38,7 @@ cps3() {
 
 running_kernel=$(uname -r)
 if [ "$running_kernel" != "$kernel_branch" ]; then
-    echo $kernel_branch | grep rc
-    if [ "$?" == "0" ]; then
+    if [[ "$kernel_branch" =~ "-rc" ]]; then
         kernel_branch=$(echo $kernel_branch | perl -ne '/(\d+.\d+)(-rc\d+)/; print $1.".0$2"')
     fi
 
