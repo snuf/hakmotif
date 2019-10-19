@@ -46,6 +46,7 @@ updateGrub() {
         grep -v recovery | \
         awk -F: '{ print $1 }')
     sed -i s/GRUB_DEFAULT=0/GRUB_DEFAULT=${optNum}/ /etc/default/grub
+    update-grub
 }
 
 running_kernel=$(uname -r)
