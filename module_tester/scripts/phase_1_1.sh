@@ -5,6 +5,13 @@ echo "PHASE 1.1 START" >> /var/log/fio_test.log
 SECONDS=0
 . envfile
 
+# solve others later
+running_kernel=$(uname -r)
+if [ "$running_kernel" != "$kernel_branch" ]; then
+    echo "Grub phase 1 update gone bad, or just kernel install?"
+    exit 1
+fi
+
 if [ ! -d "iomemory-vsl" ]; then
     git clone https://github.com/snuf/iomemory-vsl
 fi

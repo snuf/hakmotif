@@ -37,6 +37,17 @@ cps3() {
     done
 }
 
+updateGrub() {
+    kernelVer=$1
+    fgrep menuentry /boot/grub/grub.cfg | \
+        awk -F\' '{ print $2 }' | \
+        grep -v ^$ > menuOpts.tmp
+    optNum=$(grep -Fn $kernelVer menuOpts.tmp | \
+        grep -v recovery | \
+        awk -F: '{ print $1 }')
+    sed -i s/GRUB_DEFAULT=0/GRUB_DEFAULT=${optNum}/ /etc/default/grub
+}
+
 running_kernel=$(uname -r)
 if [ "$running_kernel" != "$kernel_branch" ]; then
     if [[ "$kernel_branch" =~ "-rc" ]]; then
@@ -50,5 +61,7 @@ if [ "$running_kernel" != "$kernel_branch" ]; then
     set -e
     dpkg -i *.deb
 fi
+updateGrub $kernel_branch
 delta=$SECONDS
 echo "PHASE 1 END: $delta" >> /var/log/fio_test.log
+exit 1
