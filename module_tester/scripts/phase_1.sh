@@ -62,6 +62,6 @@ if [ "$running_kernel" != "$kernel_branch" ]; then
     set -e
     dpkg -i *.deb
 fi
-updateGrub $kernel_branch
+# updateGrub $kernel_branch
 delta=$SECONDS
 echo "PHASE 1 END: $delta" >> /var/log/fio_test.log
