@@ -1,7 +1,8 @@
 
 cpus = 8
 memory = 8192
-box = "generic/ubuntu1804"
+# box = "generic/ubuntu1904"
+box = "generic/debian10"
 hostname = "fio.local"
 
 $proxy = <<-SHELL

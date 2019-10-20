@@ -19,7 +19,7 @@ apt-get install -y sudo
 apt-get install -y gcc make \
   git make fakeroot build-essential fio \
   debhelper libelf-dev python-pip rsync jq procps \
-  kexec-tools alien
+  kexec-tools alien linux-headers-$(uname -r)
 
 apt -y autoremove && sudo apt -y clean
 curl -o /usr/local/bin/mc \
@@ -50,7 +50,7 @@ updateGrub() {
 }
 
 running_kernel=$(uname -r)
-if [ "$running_kernel" != "$kernel_branch" ]; then
+if [ "$running_kernel" != "$kernel_branch" -a -z "$kernel_branch" ]; then
     if [[ "$kernel_branch" =~ "-rc" ]]; then
         kernel_branch=$(echo $kernel_branch | perl -ne '/(\d+.\d+)(-rc\d+)/; print $1.".0$2"')
     fi
@@ -61,7 +61,9 @@ if [ "$running_kernel" != "$kernel_branch" ]; then
     rm *-dbg*
     set -e
     dpkg -i *.deb
+    # updateGrub $kernel_branch$
+else if [ -Z "$kernel_branch" ]; then
+    echo "Leaving kernel alone."
 fi
-# updateGrub $kernel_branch
 delta=$SECONDS
 echo "PHASE 1 END: $delta" >> /var/log/fio_test.log
