@@ -27,7 +27,7 @@ if [ "$ID_LIKE" == "debian" ]; then
       kexec-tools alien linux-headers-$(uname -r)
 
     apt -y autoremove && sudo apt -y clean
-elif [ "$ID_LIKE" == "redhat" ]; then
+elif [[ "$ID_LIKE" =~ "rhel" ]]; then
     yum install -y gcc git make fio jq python2-pip
 else
     echo "unsupported os: $ID_LIKE"
