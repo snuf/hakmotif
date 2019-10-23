@@ -7,7 +7,7 @@ SECONDS=0
 
 # solve others later
 running_kernel=$(uname -r)
-if [ "$running_kernel" != "$kernel_branch" -a -z "$kernel_branch" ]; then
+if [ "$running_kernel" != "$kernel_branch" -a "$kernel_branch" != "" ]; then
     echo "Grub phase 1 update gone bad, or just kernel install?"
     exit 1
 fi

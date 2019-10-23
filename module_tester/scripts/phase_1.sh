@@ -5,26 +5,37 @@
 echo "PHASE 1 START" > /var/log/fio_test.log
 SECONDS=0
 source envfile
-
-export DEBIAN_FRONTEND=noninteractive
-apt install debconf-utils
-
-echo 'libssl1.0.0:amd64 libssl1.0.0/restart-services string' | \
-    sudo debconf-set-selections
-if [ "$apt_proxy" != "" ]; then
-    echo "Acquire::http::Proxy \"$apt_proxy\";" > /etc/apt/apt.conf.d/01proxy
+osr="/etc/os-release"
+if [ -f "$osr" ]; then
+    source $osr
 fi
-apt-get update
-apt-get install -y sudo
-apt-get install -y gcc make \
-  git make fakeroot build-essential fio \
-  debhelper libelf-dev python-pip rsync jq procps \
-  kexec-tools alien linux-headers-$(uname -r)
 
-apt -y autoremove && sudo apt -y clean
+if [ "$ID_LIKE" == "debian" ]; then
+    export DEBIAN_FRONTEND=noninteractive
+    apt install debconf-utils
+
+    echo 'libssl1.0.0:amd64 libssl1.0.0/restart-services string' | \
+    sudo debconf-set-selections
+    if [ "$apt_proxy" != "" ]; then
+        echo "Acquire::http::Proxy \"$apt_proxy\";" > /etc/apt/apt.conf.d/01proxy
+    fi
+    apt-get update
+    apt-get install -y sudo
+    apt-get install -y gcc make \
+      git make fakeroot build-essential fio \
+      debhelper libelf-dev python-pip rsync jq procps \
+      kexec-tools alien linux-headers-$(uname -r)
+
+    apt -y autoremove && sudo apt -y clean
+elif [ "$ID_LIKE" == "redhat" ]; then
+    yum install -y gcc git make fio jq python2-pip
+else
+    echo "unsupported os: $ID_LIKE"
+    exit 1
+fi
 curl -o /usr/local/bin/mc \
-  https://dl.minio.io/client/mc/release/linux-amd64/mc && \
-  chmod +x /usr/local/bin/mc
+    https://dl.minio.io/client/mc/release/linux-amd64/mc && \
+    chmod +x /usr/local/bin/mc
 
 mc config host add s3 $MC_ENDPOINT $MC_ACCESS $MC_SECRET $MC_APIVER
 cps3() {
@@ -50,7 +61,7 @@ updateGrub() {
 }
 
 running_kernel=$(uname -r)
-if [ "$running_kernel" != "$kernel_branch" -a -z "$kernel_branch" ]; then
+if [ "$running_kernel" != "$kernel_branch" -a "$kernel_branch" != "" ]; then
     if [[ "$kernel_branch" =~ "-rc" ]]; then
         kernel_branch=$(echo $kernel_branch | perl -ne '/(\d+.\d+)(-rc\d+)/; print $1.".0$2"')
     fi
@@ -60,9 +71,13 @@ if [ "$running_kernel" != "$kernel_branch" -a -z "$kernel_branch" ]; then
     set +e
     rm *-dbg*
     set -e
-    dpkg -i *.deb
+    if [ "$ID_LIKE" == "debian" ]; then
+        dpkg -i *.deb
+    else
+        echo "No custom kernel supported for $ID_LIKE. leaving $running_kernel in place"
+    fi
     # updateGrub $kernel_branch$
-else if [ -Z "$kernel_branch" ]; then
+elif [ "$kernel_branch" == "" ]; then
     echo "Leaving kernel alone."
 fi
 delta=$SECONDS

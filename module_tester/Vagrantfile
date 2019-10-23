@@ -1,8 +1,22 @@
+require 'getoptlong'
+
+opts = GetoptLong.new(
+  [ '--box', GetoptLong::OPTIONAL_ARGUMENT ]
+)
+
+boxParam='debian10'
+
+opts.each do |opt, arg|
+  case opt
+    when '--box'
+      boxParam=arg
+  end
+end
 
 cpus = 8
 memory = 8192
 # box = "generic/ubuntu1904"
-box = "generic/debian10"
+box = "generic/#{boxParam}"
 hostname = "fio.local"
 
 $proxy = <<-SHELL
