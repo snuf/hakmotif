@@ -9,7 +9,7 @@ logFile="${resultDir}/$(date +%Y%m%d-%H%M%S)"
 if [ ! -d "$resultDir" ];then
     mkdir $resultDir
 fi
-vagrant up --provision | tee -a $logFile
+vagrant up | tee -a $logFile
 echo "$0 - RUNTIME: ${SECONDS}s" | tee -a $logFile
 
 # vagrant destroy --force | tee -a $start

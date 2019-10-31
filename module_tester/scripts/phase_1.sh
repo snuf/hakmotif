@@ -8,9 +8,14 @@ source envfile
 osr="/etc/os-release"
 if [ -f "$osr" ]; then
     source $osr
+    if [ "$ID_LIKE" == "" ]; then
+        dist=$ID
+    else
+        dist=$ID_LIKE
+    fi
 fi
 
-if [ "$ID_LIKE" == "debian" ]; then
+if [ "$dist" == "debian" ]; then
     export DEBIAN_FRONTEND=noninteractive
     apt install debconf-utils
 
@@ -27,10 +32,17 @@ if [ "$ID_LIKE" == "debian" ]; then
       kexec-tools alien linux-headers-$(uname -r)
 
     apt -y autoremove && sudo apt -y clean
-elif [[ "$ID_LIKE" =~ "rhel" ]]; then
+elif [[ "$dist" =~ "rhel" ]]; then
     yum install -y gcc git make fio jq python2-pip
+elif [[ "$dist" =~ "suse" ]]; then
+    # hard code suse for now...
+    echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+    zypper -n install gcc git make fio jq python2-pip ntp
+    rm /etc/localtime && ln -s /usr/share/zoneinfo/US/Pacific /etc/localtime
+    ntpdate 0.ubuntu.pool.ntp.org
+    export PATH=$PATH:/usr/local/bin
 else
-    echo "unsupported os: $ID_LIKE"
+    echo "unsupported os: $dist"
     exit 1
 fi
 curl -o /usr/local/bin/mc \
@@ -65,16 +77,16 @@ if [ "$running_kernel" != "$kernel_branch" -a "$kernel_branch" != "" ]; then
     if [[ "$kernel_branch" =~ "-rc" ]]; then
         kernel_branch=$(echo $kernel_branch | perl -ne '/(\d+.\d+)(-rc\d+)/; print $1.".0$2"')
     fi
-
-    cps3 s3/$pkg_loc linux-image-${kernel_branch} .
-    cps3 s3/$pkg_loc linux-headers-${kernel_branch} .
-    set +e
-    rm *-dbg*
-    set -e
-    if [ "$ID_LIKE" == "debian" ]; then
-        dpkg -i *.deb
+    if [ "$dist" != "debian" ]; then
+        echo "No custom kernel supported for $dist. leaving $running_kernel in place"
+        sed -i 's/^kernel_branch=/# kernel_branch=/g' envfile
     else
-        echo "No custom kernel supported for $ID_LIKE. leaving $running_kernel in place"
+        cps3 s3/$pkg_loc linux-image-${kernel_branch} .
+        cps3 s3/$pkg_loc linux-headers-${kernel_branch} .
+        set +e
+        rm *-dbg*
+        set -e
+        dpkg -i *.deb
     fi
     # updateGrub $kernel_branch$
 elif [ "$kernel_branch" == "" ]; then

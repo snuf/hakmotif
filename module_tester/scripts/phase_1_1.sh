@@ -28,9 +28,9 @@ if [ "$?" == "0" ]; then
     else
         set -e
         insmod iomemory-vsl.ko
-        fios=$(ls -1 /sys/block/fio*)
+        fios=$(ls -1 /sys/block | grep fio)
         for fio in $fios; do
-            echo noop > ${fio}/queue/scheduler
+            echo noop > /sys/block/${fio}/queue/scheduler
         done
     fi
 else

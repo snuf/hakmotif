@@ -1,22 +1,31 @@
 require 'getoptlong'
 
+# options need to come directly after the vagrant thingy
 opts = GetoptLong.new(
-  [ '--box', GetoptLong::OPTIONAL_ARGUMENT ]
-)
+  [ '--box', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--force', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--break-provisioning', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--provision', GetoptLong::OPTIONAL_ARGUMENT ]
+) 
 
-boxParam='debian10'
+boxParam='generic/debian10'
+haltProvisioning=false
 
 opts.each do |opt, arg|
   case opt
     when '--box'
       boxParam=arg
+    when '--break-provisioning'
+      haltProvisioning=true
   end
 end
 
 cpus = 8
 memory = 8192
 # box = "generic/ubuntu1904"
-box = "generic/#{boxParam}"
+# box = "generic/debian10"
+# box = "generic/opensuse15
+box = "#{boxParam}"
 hostname = "fio.local"
 
 $proxy = <<-SHELL
@@ -35,14 +44,19 @@ Vagrant.configure("2") do |config|
         lv.memory = memory
         lv.pci :bus => '0x0b', :slot => '0x00', :function => '0x0'
         lv.pci :bus => '0x0c', :slot => '0x00', :function => '0x0'
+        if #{box}.match(/suse/i)
+            lv.disk_bus = "sata"
+        end
     end
     config.vm.provision "shell", inline: $proxy, privileged: true
     config.vm.provision "file", source: "../envfile", destination: "envfile"
     config.vm.provision "shell", path: "scripts/phase_1.sh"
     config.vm.provision :reload
-    config.vm.provision "shell", path: "scripts/phase_1_1.sh"
-    config.vm.provision "shell", path: "scripts/phase_1_2.sh"
-    config.vm.provision "shell", path: "scripts/phase_2.sh"
-    config.vm.provision "shell", path: "scripts/phase_3.sh"
-    config.vm.provision "shell", path: "scripts/phase_4.sh"
+    if not haltProvisioning
+        config.vm.provision "shell", path: "scripts/phase_1_1.sh"
+        config.vm.provision "shell", path: "scripts/phase_1_2.sh"
+        config.vm.provision "shell", path: "scripts/phase_2.sh"
+        config.vm.provision "shell", path: "scripts/phase_3.sh"
+        config.vm.provision "shell", path: "scripts/phase_4.sh"
+    end
 end
