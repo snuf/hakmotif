@@ -36,10 +36,16 @@ elif [[ "$dist" =~ "rhel" ]]; then
     yum install -y gcc git make fio jq python2-pip
 elif [[ "$dist" =~ "suse" ]]; then
     # hard code suse for now...
-    echo "nameserver 8.8.8.8" >> /etc/resolv.conf
-    zypper -n install gcc git make fio jq python2-pip ntp
+    echo "NETCONFIG_DNS_STATIC_SERVERS=8.8.8.8" >> /etc/sysconfig/network/config
+    netconfig update -f
+    zypper -n install gcc git make fio jq python2-pip chrony vim
     rm /etc/localtime && ln -s /usr/share/zoneinfo/US/Pacific /etc/localtime
-    ntpdate 0.ubuntu.pool.ntp.org
+    systemctl enable chronyd
+    systemctl start chronyd
+    sleep 5
+    chronyc makestep
+    sleep 5
+    ln -s /usr/local/bin/mc /usr/bin/mc
     export PATH=$PATH:/usr/local/bin
 else
     echo "unsupported os: $dist"
