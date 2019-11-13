@@ -35,6 +35,12 @@ $proxy = <<-SHELL
     fi
 SHELL
 
+$resolvFix = <<-SHELL
+    echo "DNS=192.168.86.1" >> /etc/systemd/resolved.conf
+    systemctl daemon-reload
+    systemctl restart systemd-resolved
+SHELL
+
 Vagrant.configure("2") do |config|
     config.vm.box = box
     config.vm.host_name = hostname
@@ -47,8 +53,14 @@ Vagrant.configure("2") do |config|
         if #{box}.match(/suse/i)
             lv.disk_bus = "sata"
         end
+        if #{box}.match(/archlinux/i)
+            lv.disk_bus = "virtio"
+            config.vm.provision "shell", inline: $resolvFix, privileged: true
+        end
+        if #{box}.match(/debian/i) or #{box}.match(/ubuntu/)
+            config.vm.provision "shell", inline: $proxy, privileged: true
+        end
     end
-    config.vm.provision "shell", inline: $proxy, privileged: true
     config.vm.provision "file", source: "../envfile", destination: "envfile"
     config.vm.provision "shell", path: "scripts/phase_1.sh"
     config.vm.provision :reload
