@@ -4,6 +4,9 @@
 set -e
 set -x
 
+#
+# add journalctl here for arch
+#
 getSyslog() {
     set +e
     tail -10 /var/log/syslog | grep error

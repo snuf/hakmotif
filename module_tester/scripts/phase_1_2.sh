@@ -26,6 +26,13 @@ if [ "$dist" == "debian" ]; then
     sudo alien $fioutil
     fioutil=$(ls -1 | grep deb)
     sudo dpkg -i $fioutil
+# hmzzz
+elif [ "dist" == "arch" ]; then
+    set -e
+    mv $fioutil /
+    cd /
+    rpmextract.sh $fioutil
+    set +e
 else
     rpm -i $fioutil
 fi

@@ -8,6 +8,9 @@ opts = GetoptLong.new(
   [ '--provision', GetoptLong::OPTIONAL_ARGUMENT ]
 ) 
 
+
+# "archlinux/archlinux" 
+# "suse/something???"
 boxParam='generic/debian10'
 haltProvisioning=false
 
