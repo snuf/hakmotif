@@ -11,6 +11,7 @@ make clean
 make
 sudo insmod iomemory-vsl.ko
 sudo mount /dev/fioa1 /mnt
+cd ~
 sudo bash scripts/test_page_cache.sh
 sudo bash scripts/test_tgz.sh
 
