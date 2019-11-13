@@ -13,6 +13,7 @@ fio_defaults="--ioengine=libaio \
     --size=1G \
     --numjobs=8 \
     --runtime=60 \
+    --warnings-fatal \
     --group_reporting \
     --verify_state_save=1 \
     --do_verify=1 \
@@ -30,10 +31,4 @@ sudo fio \
     --bs=${size}k \
     --direct=$direct \
     $fio_defaults
-
-set -e
-sudo tail -10 /var/log/syslog | grep error
-if [ "$?" != "0" ]; then
-    echo "broken"
-    exit 1
-fi
+echo $?
