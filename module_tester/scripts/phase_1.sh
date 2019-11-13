@@ -47,7 +47,7 @@ elif [[ "$dist" =~ "suse" ]]; then
     sleep 5
     ln -s /usr/local/bin/mc /usr/bin/mc
     export PATH=$PATH:/usr/local/bin
-elif [[ "$dist" =~ "archlinux" ]]; then
+elif [[ "$dist" =~ "arch" ]]; then
     pacman --noconfirm -Syu git rsync gcc make fio jq
 else
     echo "unsupported os: $dist"
