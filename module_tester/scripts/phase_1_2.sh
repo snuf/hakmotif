@@ -18,7 +18,9 @@ fi
 opwd=${PWD}
 fioutil="fio-util-3.2.16.1731-1.0.el7.x86_64.rpm"
 loc=rpms
-mkdir pkg
+if [ ! -d pkg ]; then
+    mkdir pkg
+fi
 cd pkg
 mc cp s3/$loc/$fioutil ./$fioutil
 
@@ -27,7 +29,7 @@ if [ "$dist" == "debian" ]; then
     fioutil=$(ls -1 | grep deb)
     sudo dpkg -i $fioutil
 # hmzzz
-elif [ "dist" == "arch" ]; then
+elif [ "$dist" == "arch" ]; then
     set -e
     mv $fioutil /
     cd /

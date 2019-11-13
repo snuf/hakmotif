@@ -5,7 +5,8 @@ opts = GetoptLong.new(
   [ '--box', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--force', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--break-provisioning', GetoptLong::OPTIONAL_ARGUMENT ],
-  [ '--provision', GetoptLong::OPTIONAL_ARGUMENT ]
+  [ '--provision', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--debug', GetoptLong::OPTIONAL_ARGUMENT ]
 ) 
 
 

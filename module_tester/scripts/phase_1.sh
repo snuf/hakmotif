@@ -48,6 +48,9 @@ elif [[ "$dist" =~ "suse" ]]; then
     ln -s /usr/local/bin/mc /usr/bin/mc
     export PATH=$PATH:/usr/local/bin
 elif [[ "$dist" =~ "arch" ]]; then
+    echo "DNS=192.168.86.1" >> /etc/systemd/resolved.conf
+    systemctl daemon-reload
+    systemctl restart systemd-resolved
     pacman --noconfirm -Syu git rsync gcc make fio jq rpmextract
 else
     echo "unsupported os: $dist"
