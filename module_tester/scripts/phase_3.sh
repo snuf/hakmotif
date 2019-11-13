@@ -15,32 +15,25 @@ fio_defaults="--ioengine=libaio \
     --numjobs=4 \
     --runtime=60 \
     --group_reporting \
-    --direct=1 \
     --verify_state_save=1 \
     --do_verify=1 \
     --directory=/mnt/fio"
 
-# RandWrite
-fio \
-    --name=randwrite \
-    --iodepth=32 \
-    --rw=randwrite \
-    --bs=4k \
-    $fio_defaults
-
-fio \
-    --name=randwrite \
-    --iodepth=16 \
-    --rw=randwrite \
-    --bs=8k \
-    $fio_defaults
-
-fio \
-    --name=randwrite \
-    --iodepth=4 \
-    --rw=randwrite \
-    --bs=256k \
-    $fio_defaults
+for size in 4 8 16 256; do
+    for rw in randwrite write; do
+        for direct in 0 1; do
+            echo "Running s: $size, rw: $rw, direct: $direct"
+            fio \
+                --name=$rw \
+                --iodepth=32 \
+                --rw=$rw \
+                --bs=${size}k \
+                --direct=$direct \
+                $fio_defaults
+        done
+    done
+done
+# I hope this bails on failure
 
 delta=$SECONDS
 echo "PHASE 3 END: $delta" >> /var/log/fio_test.log

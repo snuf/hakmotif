@@ -33,7 +33,7 @@ for size in 4 8 16 256; do
         done
     done
 done
-
+# I hope this bails on failure
 
 delta=$SECONDS
 echo "PHASE 3 END: $delta" >> /var/log/fio_test.log
