@@ -30,11 +30,11 @@ if [ "$dist" == "debian" ]; then
     sudo dpkg -i $fioutil
 # hmzzz
 elif [ "$dist" == "arch" ]; then
-    set -e
+    set +e
     mv $fioutil /
     cd /
     rpmextract.sh $fioutil
-    set +e
+    set -e
 else
     rpm -i $fioutil
 fi
