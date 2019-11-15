@@ -26,19 +26,19 @@ if [ "$dist" == "debian" ]; then
     fi
     apt-get update
     apt-get install -y sudo
-    apt-get install -y gcc make \
+    apt-get install -y gcc make dkms \
       git make fakeroot build-essential fio \
       debhelper libelf-dev python-pip rsync jq procps \
       kexec-tools alien linux-headers-$(uname -r)
 
     apt -y autoremove && sudo apt -y clean
 elif [[ "$dist" =~ "rhel" ]]; then
-    yum install -y gcc git make fio jq python2-pip
+    yum install -y gcc git make dkms fio jq python2-pip
 elif [[ "$dist" =~ "suse" ]]; then
     # hard code suse for now...
     echo "NETCONFIG_DNS_STATIC_SERVERS=8.8.8.8" >> /etc/sysconfig/network/config
     netconfig update -f
-    zypper -n install gcc git make fio jq python2-pip chrony vim
+    zypper -n install gcc git make dkms fio jq python2-pip chrony vim
     rm /etc/localtime && ln -s /usr/share/zoneinfo/US/Pacific /etc/localtime
     systemctl enable chronyd
     systemctl start chronyd
@@ -51,7 +51,7 @@ elif [[ "$dist" =~ "arch" ]]; then
     echo "DNS=192.168.86.1" >> /etc/systemd/resolved.conf
     systemctl daemon-reload
     systemctl restart systemd-resolved
-    pacman --noconfirm -Syu git rsync gcc make fio jq rpmextract
+    pacman --noconfirm -Syu git rsync gcc make fio jq rpmextract dkms
 else
     echo "unsupported os: $dist"
     exit 1
