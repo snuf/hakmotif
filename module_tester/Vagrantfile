@@ -103,8 +103,8 @@ end
 # Not ditto!
 if checkIoModule
   abort("There seems to be an iomemory module loaded: #{checkIoModule}, aborting")
-else
-  abort("testing!")
+# else
+#  abort("testing!")
 end
 
 cpus = 8
