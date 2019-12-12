@@ -1,19 +1,70 @@
 require 'getoptlong'
 
-# options need to come directly after the vagrant thingy
+# Which devices do we know about?
+# - and check for their driver on the hosting host
+# ioTypes = {
+#
+# }
+
+def checkIoModule()
+  ioModule=`lsmod | grep iomemory`
+  if ioModule != ""
+    return ioModule
+  end
+  return false
+end
+
+# Check for io devices, and keep a log of what's in use somewhere?
+def findBusIoDevices()
+  busDeviceMap={}
+  mString=' SanDisk'
+  rString='Mass storage controller [0180]: '
+  # 05:00.0 Mass storage controller [0180]: SanDisk ioDimm3 [1aed:1005] (rev 01)
+  # 06:00.0 Mass storage controller [0180]: SanDisk ioDimm3 [1aed:1005] (rev 01)
+  # 08:00.0 Mass storage controller [0180]: SanDisk ioMemory HHHL [1aed:3002]
+  ioDevices=`lspci -nn | grep #{mString}`.split(/\n+/)
+  #  .gsub("#{rString}", '').gsub("#{mString}", '').split(/\n+/)
+  if ioDevices != ""
+    for line in ioDevices
+      # somehow the first character in bust is "", so we move some things around
+      # bust[0]=bust[1]
+      # bust[1]=bust[2]
+      # bust[2]="#{bust[0]}:#{bust[1]}"
+      bust=line.split(/(\d{2}):([\d\.]+) ([\w\s]+) (\[\d+\]): ([\w\d\s]+) \[([\w\d]+):([\w\d]+)\]\s?(\(rev (\d+)?)?/)
+      busDeviceMap[bust[1]] = {
+        :pciId => "#{bust[1]}:#{bust[2]}",
+        :pciBusId => "#{bust[1]}",
+        :pciSubId => "#{bust[2]}",
+        :category => "#{bust[3]}",
+        :categoryId => "#{bust[4]}",
+        :deviceName => "#{bust[5]}",
+        :vendorId => "#{bust[6]}",
+        :deviceId => "#{bust[7]}",
+        :revision => "#{bust[9]}"
+      }
+    end
+    # organise the lists and chop em up
+    # output a list with first id before :
+    # choose ...
+    return busDeviceMap
+  end
+  return false
+end
+
 opts = GetoptLong.new(
+  [ '--pcibusid', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--box', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--force', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--break-provisioning', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--provision', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--debug', GetoptLong::OPTIONAL_ARGUMENT ]
-) 
+)
 
-
-# "archlinux/archlinux" 
+# "archlinux/archlinux"
 # "suse/something???"
 boxParam='generic/debian10'
 haltProvisioning=false
+pciBusIds=''
 
 opts.each do |opt, arg|
   case opt
@@ -21,7 +72,39 @@ opts.each do |opt, arg|
       boxParam=arg
     when '--break-provisioning'
       haltProvisioning=true
+    when
+      pciBusIds=arg
   end
+end
+
+# Should become a def
+ioDeviceMap=findBusIoDevices
+if ioDeviceMap
+  if pciBusIds != ""
+    for ios in pciBusIds.split(/,/)
+      if ioDeviceMap[ios]
+        map=ioDeviceMap[ios]
+        puts("Valid device on PCI bus #{ios}: #{map[:pciId]}, #{map[:deviceName]}, #{map[:vendorId]}:#{map[:deviceId]} ")
+      else
+        abort("Device on PCI bus #{ios} is not a valid device for me")
+      end
+    end
+  else
+    ioDeviceMap.each_key do |key|
+      map=ioDeviceMap[key]
+      puts("(#{key}) ")
+    end
+    abort("Select at least one ioDevice: --iodevices 05(,06)")
+  end
+else
+  abort("No Sandisk Mass Storage Controller Found to pass through, aborting")
+end
+
+# Not ditto!
+if checkIoModule
+  abort("There seems to be an iomemory module loaded: #{checkIoModule}, aborting")
+else
+  abort("testing!")
 end
 
 cpus = 8
@@ -33,52 +116,55 @@ box = "#{boxParam}"
 hostname = "fio.local"
 
 $proxy = <<-SHELL
-    proxy=#{ENV['APT_PROXY']}
-    if [ "$proxy" != "" ]; then
-      echo "Acquire::http::Proxy \\\"$proxy\\\";" > /etc/apt/apt.conf.d/01proxy
-    fi
+  proxy=#{ENV['APT_PROXY']}
+  if [ "$proxy" != "" ]; then
+    echo "Acquire::http::Proxy \\\"$proxy\\\";" > /etc/apt/apt.conf.d/01proxy
+  fi
 SHELL
 
 $resolvFix = <<-SHELL
-    echo "DNS=192.168.86.1" >> /etc/systemd/resolved.conf
-    systemctl daemon-reload
-    systemctl restart systemd-resolved
+  echo "DNS=192.168.86.1" >> /etc/systemd/resolved.conf
+  systemctl daemon-reload
+  systemctl restart systemd-resolved
 SHELL
 
 Vagrant.configure("2") do |config|
-    config.vm.box = box
-    config.vm.host_name = hostname
+  config.vm.box = box
+  config.vm.host_name = hostname
 
-    config.vm.provider :libvirt do |lv, override|
-        lv.cpus = cpus
-        lv.memory = memory
-        lv.pci :bus => '0x0b', :slot => '0x00', :function => '0x0'
-        lv.pci :bus => '0x0c', :slot => '0x00', :function => '0x0'
-        if #{box}.match(/suse/i)
-            lv.disk_bus = "sata"
-        end
-        if #{box}.match(/archlinux/i)
-            lv.disk_bus = "virtio"
-            config.vm.provision "shell", inline: $resolvFix, privileged: true
-            # puts "With arch you have to run 'vagrant provision' after failure"
-        end
-        if #{box}.match(/debian/i) or #{box}.match(/ubuntu/)
-            config.vm.provision "shell", inline: $proxy, privileged: true
-        end
+  config.vm.provider :libvirt do |lv, override|
+    lv.cpus = cpus
+    lv.memory = memory
+    # Support for more dynamic things...
+    for ios in pciBusIds.split(/,/)
+       lv.pci :bus => "0x#{ios}", :slot => '0x00', :function => '0x0'
     end
-    config.vm.provision "file", source: "../envfile", destination: "envfile"
-    config.vm.provision "shell", path: "scripts/prep_host.sh"
-    config.vm.provision :reload
-    if not haltProvisioning
-        config.vm.provision "shell", path: "scripts/setup_module.sh"
-        config.vm.provision "shell", path: "scripts/build_package.sh"
-        # test package install?
-        config.vm.provision "shell", path: "scripts/install_fio_tools.sh"
-        config.vm.provision "shell", path: "scripts/setup_filesystem.sh"
-        config.vm.provision "shell", path: "scripts/test_tgz.sh"
-        config.vm.provision "shell", path: "scripts/test_page_cache.sh"
-        config.vm.provision "shell", path: "scripts/test_fio.sh"
-        config.vm.provision "shell", path: "scripts/remove_module.sh"
-        config.vm.provision "shell", path: "scripts/scrape_errors.sh"
+    # lv.pci :bus => '0x06', :slot => '0x00', :function => '0x0'
+    if #{box}.match(/suse/i)
+      lv.disk_bus = "sata"
     end
+    if #{box}.match(/archlinux/i)
+      lv.disk_bus = "virtio"
+      config.vm.provision "shell", inline: $resolvFix, privileged: true
+      # puts "With arch you have to run 'vagrant provision' after failure"
+    end
+    if #{box}.match(/debian/i) or #{box}.match(/ubuntu/)
+      config.vm.provision "shell", inline: $proxy, privileged: true
+    end
+  end
+  config.vm.provision "file", source: "../envfile", destination: "envfile"
+  config.vm.provision "shell", path: "scripts/prep_host.sh"
+  config.vm.provision :reload
+  if not haltProvisioning
+      config.vm.provision "shell", path: "scripts/setup_module.sh"
+      config.vm.provision "shell", path: "scripts/build_package.sh"
+      # test package install?
+      config.vm.provision "shell", path: "scripts/install_fio_tools.sh"
+      config.vm.provision "shell", path: "scripts/setup_filesystem.sh"
+      config.vm.provision "shell", path: "scripts/test_tgz.sh"
+      config.vm.provision "shell", path: "scripts/test_page_cache.sh"
+      config.vm.provision "shell", path: "scripts/test_fio.sh"
+      config.vm.provision "shell", path: "scripts/remove_module.sh"
+      config.vm.provision "shell", path: "scripts/scrape_errors.sh"
+  end
 end
