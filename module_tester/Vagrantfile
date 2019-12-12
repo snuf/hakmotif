@@ -72,7 +72,7 @@ opts.each do |opt, arg|
       boxParam=arg
     when '--break-provisioning'
       haltProvisioning=true
-    when
+    when '--pcibusid'
       pciBusIds=arg
   end
 end
