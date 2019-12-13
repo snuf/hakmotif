@@ -1,4 +1,5 @@
 require 'getoptlong'
+# ruby -w Vagrantfile
 
 # Which devices do we know about?
 # - and check for their driver on the hosting host
@@ -14,22 +15,20 @@ def checkIoModule()
   return false
 end
 
-# Check for io devices, and keep a log of what's in use somewhere?
+##
+# Check for io devices that we care about
+##
 def findBusIoDevices()
   busDeviceMap={}
   mString=' SanDisk'
-  rString='Mass storage controller [0180]: '
+  # rString='Mass storage controller [0180]: '
   # 05:00.0 Mass storage controller [0180]: SanDisk ioDimm3 [1aed:1005] (rev 01)
   # 06:00.0 Mass storage controller [0180]: SanDisk ioDimm3 [1aed:1005] (rev 01)
   # 08:00.0 Mass storage controller [0180]: SanDisk ioMemory HHHL [1aed:3002]
   ioDevices=`lspci -nn | grep #{mString}`.split(/\n+/)
-  #  .gsub("#{rString}", '').gsub("#{mString}", '').split(/\n+/)
   if ioDevices != ""
     for line in ioDevices
       # somehow the first character in bust is "", so we move some things around
-      # bust[0]=bust[1]
-      # bust[1]=bust[2]
-      # bust[2]="#{bust[0]}:#{bust[1]}"
       bust=line.split(/(\d{2}):([\d\.]+) ([\w\s]+) (\[\d+\]): ([\w\d\s]+) \[([\w\d]+):([\w\d]+)\]\s?(\(rev (\d+)?)?/)
       busDeviceMap[bust[1]] = {
         :pciId => "#{bust[1]}:#{bust[2]}",
@@ -43,12 +42,49 @@ def findBusIoDevices()
         :revision => "#{bust[9]}"
       }
     end
-    # organise the lists and chop em up
-    # output a list with first id before :
-    # choose ...
     return busDeviceMap
   end
   return false
+end
+
+##
+# Validate the devices that can be used
+##
+def checkValidDevices(pciBusIds)
+  ioDeviceMap=findBusIoDevices
+  if pciBusIds != ""
+    for ios in pciBusIds.split(/,/)
+      if ioDeviceMap[ios]
+        map=ioDeviceMap[ios]
+        puts("Valid device on PCI bus #{ios}: #{map[:pciId]}, #{map[:deviceName]}, #{map[:vendorId]}:#{map[:deviceId]} ")
+      else
+        deviceListUsage
+        abort("Device on PCI bus #{ios} is not a valid device")
+      end
+    end
+  end
+end
+
+##
+# Give back usage based on devices that exist
+##
+def deviceListUsage()
+  ioDeviceMap=findBusIoDevices
+  if ioDeviceMap != ""
+    keys=[]
+    ioDeviceMap.each_key do |key|
+      keys.push(key)
+      map=ioDeviceMap[key]
+      puts("pcibusid: #{key} - device: #{map[:deviceName]} [#{map[:vendorId]}:#{map[:deviceId]}]")
+    end
+    line="#{keys.shift}"
+    if keys.length != 0
+      line = line + ",(" + keys.join(",") + ")"
+    end
+    puts("Usage: vagrant --pcibusid=#{line} <command>")
+  else
+    puts("No Sandisk Mass Storage Controller Found to pass through, aborting")
+  end
 end
 
 opts = GetoptLong.new(
@@ -64,43 +100,34 @@ opts = GetoptLong.new(
 # "suse/something???"
 boxParam='generic/debian10'
 haltProvisioning=false
+skipSelection=true
 pciBusIds=''
+
+for arg in ARGV
+  case arg
+  when 'up'
+      skipSelection=false
+  end
+end
 
 opts.each do |opt, arg|
   case opt
-    when '--box'
-      boxParam=arg
-    when '--break-provisioning'
-      haltProvisioning=true
-    when '--pcibusid'
-      pciBusIds=arg
+  when '--box'
+    boxParam=arg
+  when '--break-provisioning'
+    haltProvisioning=true
+  when '--pcibusid'
+    pciBusIds=arg
   end
 end
 
-# Should become a def
-ioDeviceMap=findBusIoDevices
-if ioDeviceMap
-  if pciBusIds != ""
-    for ios in pciBusIds.split(/,/)
-      if ioDeviceMap[ios]
-        map=ioDeviceMap[ios]
-        puts("Valid device on PCI bus #{ios}: #{map[:pciId]}, #{map[:deviceName]}, #{map[:vendorId]}:#{map[:deviceId]} ")
-      else
-        abort("Device on PCI bus #{ios} is not a valid device for me")
-      end
-    end
-  else
-    ioDeviceMap.each_key do |key|
-      map=ioDeviceMap[key]
-      puts("(#{key}) ")
-    end
-    abort("Select at least one ioDevice: --iodevices 05(,06)")
-  end
-else
-  abort("No Sandisk Mass Storage Controller Found to pass through, aborting")
+if pciBusIds == "" && skipSelection == false
+  deviceListUsage
+  exit(1)
+elsif pciBusIds != ""
+  checkValidDevices(pciBusIds)
 end
 
-# Not ditto!
 if checkIoModule
   abort("There seems to be an iomemory module loaded: #{checkIoModule}, aborting")
 # else
