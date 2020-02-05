@@ -1,0 +1,120 @@
+to use fio-status, the libvsl_4.so needs to be copied in, it comes
+along with the driver source (eek) Also the iodrive4 needs a good
+slot, not half assed. Where the 3 can do with 4x2, the 4 needs more
+than a 4x3 (double check)
+
+you can also only use one type of device in a machine, as the drivers
+fuck with each other!!@<!@
+
+Dell firmware, latest does not contain an update. This is the firmware
+that is "advertised" with 4.3.6.1173. This driver needs firmware 8.9.4 at
+least.
+Lenevo's firmware, FW_Fusion-io_iomemory_sx300\&350_4.2.5_anyos, contins
+firmware 8.9.5.118177, which should work with the driver. This means that
+the older dell firmware will also have it.
+
+snuf@scipio:~/Downloads/iodrive4/fio-util-4/usr/bin$ sudo ./fio-update-iodrive -d /dev/fct0 ../../../FW_Fusion-io_iomemory_sx300\&350_4.2.5_anyos/fusion_4.2.5-20160412.fff 
+WARNING: DO NOT TURN OFF POWER OR RUN ANY IODRIVE UTILITIES WHILE THE FIRMWARE UPDATE IS IN PROGRESS
+  Please wait...this could take a while
+
+Updating: [====================] (100%) -
+ /dev/fct0 - successfully updated the following:
+ Updated the firmware from 8.7.11 rev 20141212 to 8.9.5 rev 20160412
+  Updated CONTROLLER from 8.7.11.117685 to 8.9.5.118177
+  Updated SMPCTRL from 0.0.39 to 0.0.44
+  Installed UEFI 4.2.5.1266
+  Updated NCE from 1.0.0.704 to 1.0.8.100749
+
+When having the drive plugged into the wrong slot it will record PCIe errors when running fio-status:
+08:00.0	ioMemory Adapter Controller, Product Number:F13-004-1300-CS-0001, SN:1446G1531
+!! --->	There are active errors or warnings on this device!  Read below for details.
+	PCI:08:00.0
+	Firmware v8.9.5, rev 20160412 Public
+	Internal temperature: 70.38 degC, max 72.35 degC
+
+	ACTIVE ERRORS:
+	    PCIe non-correctable errors encountered. 
+
+These are cleared by running fio-pci-check:
+snuf@scipio:~/Downloads/iodrive4/fio-util-4/usr/bin$ sudo ./fio-pci-check 
+
+Root Bridge PCIe 15000 MB/sec needed max
+
+      Bridge 0000:00:01.01 (02-06) (8086:3c03)
+          Needed 2000 MB/sec Avail 2000 MB/sec
+
+            Bridge 0000:02:00.00 (03-06) (10b5:8616)
+                Needed 2000 MB/sec Avail 2000 MB/sec
+              * Correctable Error(s): Detected
+              * Unsupported Request(s): Detected
+                Clearing Errors
+                Slot Power limit: 0.244W (244mw)
+                clearing corr_err_status_reg (0x2000)
+
+                  Bridge 0000:03:05.00 (05-05) (10b5:8616)
+                      Needed 1000 MB/sec Avail 1000 MB/sec
+                    * Correctable Error(s): Detected
+                    * Unsupported Request(s): Detected
+                      Clearing Errors
+
+                        ioDrive1 0000:05:00.0 (1005) Firmware 109322
+                            Slot Power limit: 25.0W (25000mw)
+
+                  Bridge 0000:03:06.00 (06-06) (10b5:8616)
+                      Needed 1000 MB/sec Avail 1000 MB/sec
+                    * Correctable Error(s): Detected
+                    * Unsupported Request(s): Detected
+                      Clearing Errors
+
+                        ioDrive1 0000:06:00.0 (1005) Firmware 109322
+                            Slot Power limit: 25.0W (25000mw)
+
+      Bridge 0000:00:03.00 (08-08) (8086:3c08)
+          Needed 4000 MB/sec Avail 4000 MB/sec
+
+            ioDrive3 0000:08:00.0 (3002) Firmware 118177
+              * Correctable Error(s): Detected
+              * Unsupported Request(s): Detected
+                Clearing Errors
+                Slot Power limit: 0.244W (244mw)
+
+snuf@scipio:~/Downloads/iodrive4/fio-util-4/usr/bin$ sudo ./fio-status 
+
+Note: 2 unmanaged ioMemory devices found requiring a v3.x driver.
+   Install the driver package to see device information.
+   Note that only one driver package can be installed at a time.
+
+Found 1 VSL driver package:
+   4.3.6 build 1173 Driver: not loaded
+
+Found 1 ioMemory device in this system
+
+Adapter: ioMono  (driver 4.3.6)
+	ioMemory SX300-1300, Product Number:F13-004-1300-CS-0001, SN:1446G1531, FIO SN:1446G1531
+	PCIe Power limit threshold: Disabled
+	Connected ioMemory modules:
+	  08:00.0:	Product Number:F13-004-1300-CS-0001, SN:1446G1531
+
+08:00.0	ioMemory Adapter Controller, Product Number:F13-004-1300-CS-0001, SN:1446G1531
+	PCI:08:00.0
+	Firmware v8.9.5, rev 20160412 Public
+	Internal temperature: 73.33 degC, max 74.81 degC
+
+After loading the module, the upgrade continues...
+
+##### iodrive 3 testing pv
+# https://www.redhat.com/archives/linux-lvm/2018-May/msg00042.html
+sudo wipefs -a /dev/fiob
+pvcreate -vv /dev/fiob
+vgcreate -vv ioDimm3-vg /dev/fiob
+lvcreate -L 100G ioDimm3-vg -n fusion0
+lvcreate -L 100G ioDimm3-vg -n fusion1
+mkfs.ext4 /dev/mapper/ioDimm3--vg-fusion0
+mkfs.xfs /dev/mapper/ioDimm3--vg-fusion1
+
+# mount /dev/mapper/ioDimm3--vg-fusion0
+# mount /dev/mapper/ioDimm3--vg-fusion1
+# umount 
+# before rmmod
+vgchange -a n ioDimm3-vg
+

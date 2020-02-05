@@ -3,7 +3,8 @@
 #
 echo "PHASE 2 START" >> /var/log/fio_test.log
 SECONDS=0
-. envfile
+source envfile
+source local_envs.sh
 
 # 00:04.0 Mass storage controller: SanDisk ioDimm3 (rev 01)
 lspci | grep SanDisk
@@ -29,7 +30,7 @@ if [ "$dev" == "" ]; then
     exit 3
 fi
 
-# fioa   252:0    0  298G  0 disk 
+# fioa   252:0    0  298G  0 disk
 lsblk | grep ${dev}1
 if [ "$?" != "0" ]; then
     echo "no partition found on ${dev}1, creating"

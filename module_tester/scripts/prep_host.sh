@@ -5,15 +5,7 @@
 echo "PHASE 1 START" > /var/log/fio_test.log
 SECONDS=0
 source envfile
-osr="/etc/os-release"
-if [ -f "$osr" ]; then
-    source $osr
-    if [ "$ID_LIKE" == "" ]; then
-        dist=$ID
-    else
-        dist=$ID_LIKE
-    fi
-fi
+source local_envs.sh
 
 if [ "$dist" == "debian" ]; then
     export DEBIAN_FRONTEND=noninteractive

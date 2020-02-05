@@ -3,17 +3,8 @@
 #
 echo "PHASE 1.2 START" >> /var/log/fio_test.log
 SECONDS=0
-. envfile
-osr="/etc/os-release"
-if [ -f "$osr" ]; then
-    source $osr
-    if [ "$ID_LIKE" == "" ]; then
-        dist=$ID
-    else
-        dist=$ID_LIKE
-    fi
-fi
-
+source envfile
+source local_envs.sh
 
 opwd=${PWD}
 fioutil="fio-util-3.2.16.1731-1.0.el7.x86_64.rpm"

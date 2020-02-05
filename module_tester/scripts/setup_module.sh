@@ -3,7 +3,8 @@
 #
 echo "PHASE 1.1 START" >> /var/log/fio_test.log
 SECONDS=0
-. envfile
+source envfile
+source local_envs.sh
 
 # solve others later
 running_kernel=$(uname -r)
