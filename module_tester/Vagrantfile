@@ -15,6 +15,18 @@ def checkIoModule()
   return false
 end
 
+#
+#
+##
+def checkVmStatus()
+  # bad idea, circular loop, make sure status does not call status?! 
+  status=`cat .vagrant/machines/default/libvirt/box_meta` 
+  if status != ""
+    puts status
+  else
+    abort("Unable to retrieve status")
+  end
+end
 ##
 # Check for io devices that we care about
 ##
@@ -98,7 +110,9 @@ opts = GetoptLong.new(
 
 # "archlinux/archlinux"
 # "suse/something???"
-boxParam='generic/debian10'
+# 
+# boxParam='generic/debian10'
+boxParam='fedora/31-cloud-base'
 haltProvisioning=false
 skipSelection=true
 pciBusIds=''
@@ -107,6 +121,7 @@ for arg in ARGV
   case arg
   when 'up'
       skipSelection=false
+      checkStatus=true
   end
 end
 
@@ -121,6 +136,7 @@ opts.each do |opt, arg|
   end
 end
 
+status=checkVmStatus
 if pciBusIds == "" && skipSelection == false
   deviceListUsage
   exit(1)

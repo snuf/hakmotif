@@ -1,6 +1,10 @@
 #!/bin/bash -xe
 #
 #
+echo "PHASE 1.3 START" >> /var/log/fio_test.log
+SECONDS=0
+. envfile
+
 osr="/etc/os-release"
 if [ -f "$osr" ]; then
     source $osr
@@ -11,16 +15,18 @@ if [ -f "$osr" ]; then
     fi
 fi
 if [ "$dist" != "debian" ]; then
-    exit 0
+  cd iomemory-vsl
+  dpkg-buildpackage \
+    -rfakeroot --no-check-builddeps --no-sign
+else
+  cd iomemory-vsl
+  rpmbuild -ba fio-driver.spec
 fi
 
-echo "PHASE 1.3 START" >> /var/log/fio_test.log
-SECONDS=0
-. envfile
-
-cd iomemory-vsl
-dpkg-buildpackage \
-  -rfakeroot --no-check-builddeps --no-sign
+if [ "$?" != "0" ]; then
+  echo "Something went wrong building for $dist."
+  exit 1
+fi
 
 delta=$SECONDS
 echo "PHASE 1.3 END: $delta" >> /var/log/fio_test.log
