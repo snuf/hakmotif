@@ -8,6 +8,7 @@ if [ -f "$osr" ]; then
     else
         dist=$ID_LIKE
     fi
+    orig_dist=$dist
 fi
 # according to fedora convetions are for wimps
 if [ -f "/etc/redhat-release" -a "$dist" == "fedora" ]; then

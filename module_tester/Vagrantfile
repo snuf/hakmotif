@@ -160,25 +160,6 @@ memory = 8192
 box = "#{boxParam}"
 hostname = "fio.local"
 
-$proxy = <<-SHELL
-  proxy=#{ENV['APT_PROXY']}
-  if [ "$proxy" != "" ]; then
-    echo "Acquire::http::Proxy \\\"$proxy\\\";" > /etc/apt/apt.conf.d/01proxy
-  fi
-SHELL
-
-$ArchResolvFix = <<-SHELL
-  echo "DNS=192.168.86.1" >> /etc/systemd/resolved.conf
-  systemctl daemon-reload
-  systemctl restart systemd-resolved
-SHELL
-
-$FedoraResolvFix = <<-SHELL
-  echo "dns=none" >> /etc/NetworkManager/NetworkManager.conf
-  systemctl restart NetworkManager
-  echo "nameserver 192.168.86.1" >> /etc/resolv.conf
-SHELL
-
 Vagrant.configure("2") do |config|
   config.vm.box = box
   config.vm.host_name = hostname
@@ -196,15 +177,12 @@ Vagrant.configure("2") do |config|
     end
     if #{box}.match(/archlinux/i)
       lv.disk_bus = "virtio"
-      config.vm.provision "shell", inline: $ArchResolvFix, privileged: true
       # puts "With arch you have to run 'vagrant provision' after failure"
-    end
-    if #{box}.match(/debian/i) or #{box}.match(/ubuntu/)
-      config.vm.provision "shell", inline: $proxy, privileged: true
     end
   end
   config.vm.provision "file", source: "../envfile", destination: "envfile"
   config.vm.provision "file", source: "scripts/local_envs.sh", destination: "local_envs.sh"
+  config.vm.provision "shell", path: "scripts/pre_prep.sh"
   config.vm.provision "shell", path: "scripts/prep_host.sh"
   config.vm.provision :reload
   if not haltProvisioning
