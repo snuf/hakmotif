@@ -25,7 +25,9 @@ if [ "$dist" == "debian" ]; then
 
     apt -y autoremove && sudo apt -y clean
 elif [[ "$dist" =~ "rhel" ]]; then
-    yum install -y gcc git make dkms fio jq python2-pip
+    yum update && yum upgrade
+    yum install -y kernel-headers kernel-devel gcc git make dkms fio \
+      jq python2-pip rpm-build mlocate
 elif [[ "$dist" =~ "suse" ]]; then
     # hard code suse for now...
     echo "NETCONFIG_DNS_STATIC_SERVERS=8.8.8.8" >> /etc/sysconfig/network/config

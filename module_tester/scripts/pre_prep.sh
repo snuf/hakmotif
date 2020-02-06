@@ -26,7 +26,7 @@ FedoraResolvFix() {
   ns=${1:-$default_ns}
   grep dns=none /etc/NetworkManager/NetworkManager.conf
   if [ "$?" != "0" ]; then
-    echo "dns=none" >> /etc/NetworkManager/NetworkManager.conf
+    sed -i 's#\[main\]#\[main\]\ndns=none#' /etc/NetworkManager/NetworkManager.conf
   fi
   systemctl restart NetworkManager
   sleep 4
