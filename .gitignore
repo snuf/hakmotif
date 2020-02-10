@@ -1,4 +1,5 @@
 envfile
+module_tester/results/*
 header_fetcher
 meta_builder
 **/.vagrant

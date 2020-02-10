@@ -1,22 +1,24 @@
-# s3 details for minio client
+apt_proxy=   # An apt proxy, can limit bandwith with lots of testing
+nameserver=  # If you have want to override the nameserver
+             # - useful with vagrant...
+
+iomemory_branch=next_generation  # Which branch to checkout and work with
+module_loc=debs                  # Where to upload generated packages
+kernel_branch=5.4-rc8            # What kernel branch use on supported systems
+subs=debian                      # Unused ?
+
+##
+# S3 related
+##
 MC_ENDPOINT=
 MC_ACCESS=
 MC_SECRET=
 MC_APIVER=s3v4
 
-# apt proxy
-apt_proxy=
+pkg_loc=      # Kernel package location in S3, e.g. a folder named "kernel"
+config_loc=   # Config location in S3, e.g. a folder named "config"
+source_loc=   # Kernel tar.gz source location in S3 e.g. named "sources"
 
-# details
-iomemory_branch=next_generation
-kernel_branch=4.16-rc2
-subs=debian
-
-# S3 locations in the bucket
-pkg_loc=kernel
-config_loc=config
-source_loc=sources
-
-kernel_src_tgz=linux-stable.tgz
-kernel_hdrs=
-kernel_cfg=
+kernel_src_tgz=  # Kernel tar.gz file to use when building kernels
+kernel_hdrs=     # Kernel headers to use, if no pre-packaged kernel is used
+kernel_cfg=      # Kernel config to use when building alternate kernels
