@@ -4,7 +4,7 @@ nameserver=  # If you have want to override the nameserver
 
 iomemory_branch=next_generation  # Which branch to checkout and work with
 module_loc=debs                  # Where to upload generated packages
-kernel_branch=5.4-rc8            # What kernel branch use on supported systems
+kernel_branch=5.6-rc7            # What kernel branch use on supported systems
 subs=debian                      # Unused ?
 
 ##
@@ -22,3 +22,7 @@ source_loc=   # Kernel tar.gz source location in S3 e.g. named "sources"
 kernel_src_tgz=  # Kernel tar.gz file to use when building kernels
 kernel_hdrs=     # Kernel headers to use, if no pre-packaged kernel is used
 kernel_cfg=      # Kernel config to use when building alternate kernels
+
+test_device_pcibusid=   # Device to passthrough and test on with vagrant
+# Only deb derivative boxes can use the compiled kernels for now
+test_box=generic/debian10   # Vagrant box to use for module testing

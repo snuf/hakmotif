@@ -11,7 +11,7 @@ default_proxy="http://${default_ns}:8080/"
 AptProxy() {
   proxy=${1:-$default_proxy}
   if [ "$proxy" != "" ]; then
-    echo "Acquire::http::Proxy \\\"$proxy\\\";" > /etc/apt/apt.conf.d/01proxy
+    echo "Acquire::http::Proxy \"$proxy\";" > /etc/apt/apt.conf.d/01proxy
   fi 
 }
 

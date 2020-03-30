@@ -13,9 +13,9 @@ if [ "$dist" == "debian" ]; then
 
     echo 'libssl1.0.0:amd64 libssl1.0.0/restart-services string' | \
     sudo debconf-set-selections
-    if [ "$apt_proxy" != "" ]; then
-        echo "Acquire::http::Proxy \"$apt_proxy\";" > /etc/apt/apt.conf.d/01proxy
-    fi
+    # if [ "$apt_proxy" != "" ]; then
+    #    echo "Acquire::http::Proxy \"$apt_proxy\";" > /etc/apt/apt.conf.d/01proxy
+    # fi
     apt-get update
     apt-get install -y sudo
     apt-get install -y gcc make dkms \
@@ -25,7 +25,7 @@ if [ "$dist" == "debian" ]; then
 
     apt -y autoremove && sudo apt -y clean
 elif [[ "$dist" =~ "rhel" ]]; then
-    yum update && yum upgrade
+    yum upgrade -y
     yum install -y kernel-headers kernel-devel gcc git make dkms fio \
       jq python2-pip rpm-build mlocate
 elif [[ "$dist" =~ "suse" ]]; then

@@ -24,7 +24,8 @@ def checkVmStatus(boxParam)
   if status != ""
     puts status
   else
-    puts("Unable to retrieve status for #{boxParam}")
+    puts("Unable to retrieve status for #{boxParam}, updating box")
+    `vagrant --box=#{boxParam} box update`
   end
 end
 ##
@@ -112,8 +113,8 @@ opts = GetoptLong.new(
 boxParam="generic/ubuntu1904"
 boxParam="generic/opensuse15"
 boxParam='archlinux/archlinux'
-boxParam='generic/debian10'
 boxParam='fedora/31-cloud-base'
+boxParam='generic/debian10'
 haltProvisioning=false
 skipSelection=true
 pciBusIds=''
