@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 set -x
 
 kb() {
@@ -48,11 +48,11 @@ install_headers() {
   done
 }
 
-mc config host add s3 $MC_ENDPOINT $MC_ACCESS $MC_SECRET $MC_APIVER
+mc config host add s3 "$MC_ENDPOINT" "$MC_ACCESS" "$MC_SECRET" --api "$MC_APIVER"
 install_headers
 
 mkdir -p staging
-# everything from staging 
+# everything from staging
 # build script should be injectable
 if [ "$build_script" == "" ]; then
   ./build_script.sh

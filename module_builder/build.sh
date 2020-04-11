@@ -2,13 +2,15 @@
 set -e
 set -x
 
-ver=$(grep kernel_branch envfile | awk -F= '{ print $2 }')
+. ../envfile
+
+ver=$kernel_branch
 if [ "$ver" == "" ]; then
-  ver=$(basename $(pwd))
+   ver=$(basename $(pwd))
 fi
 
-file=Dockerfile.ubuntu.test
-docker build -t $ver -f $file . $OPTS
+file=Dockerfile.ubuntu
+docker build -t module_builder:$ver -f $file . $OPTS
 
 # for file in $(ls -1 Dockerfile.*); do
 #   type=$(echo $file | awk -F\. '{ print $2 }')

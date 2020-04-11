@@ -1,16 +1,16 @@
 #!/bin/bash
-
+set -e
 set -x
 
-git clone https://github.com/snuf/iomemory-vsl
-cd iomemory-vsl
+git clone ${module_repo}/${module_project}
+cd $module_project
 git checkout $module_branch
 # this needs to be part of the git repo not here, build should fail here!!!
 
 if [ "$cheat_build_file_finder" == "1" ]; then
   cd root
-  find usr/ -type f > ../debian/iomemory-vsl-source.install
-  find usr/share/doc -type f > ../debian/iomemory-vsl.install
+  find usr/ -type f > ../debian/${module_project}-source.install
+  find usr/share/doc -type f > ../debian/${module_project}.install
   cd ..
 fi
 # kernel version, headers and branch will be the same
