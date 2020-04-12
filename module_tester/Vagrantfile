@@ -104,7 +104,9 @@ opts = GetoptLong.new(
   [ '--pcibusid', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--box', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--force', GetoptLong::OPTIONAL_ARGUMENT ],
-  [ '--break-provisioning', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--halt-after-base-provisioning', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--halt-before-testing', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--skip-iomodule-check', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--provision', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--debug', GetoptLong::OPTIONAL_ARGUMENT ]
 )
@@ -115,8 +117,10 @@ boxParam="generic/opensuse15"
 boxParam='archlinux/archlinux'
 boxParam='fedora/31-cloud-base'
 boxParam='generic/debian10'
-haltProvisioning=false
+haltAfterBaseProvisioning=false
+haltBeforeTesting=false
 skipSelection=true
+skipIomoduleCheck=false
 pciBusIds=''
 
 for arg in ARGV
@@ -131,10 +135,14 @@ opts.each do |opt, arg|
   case opt
   when '--box'
     boxParam=arg
-  when '--break-provisioning'
-    haltProvisioning=true
+  when '--halt-after-base-provisioning'
+    haltAfterBaseProvisioning=true
+  when '--halt-before-testing'
+    haltBeforeTesting=true
   when '--pcibusid'
     pciBusIds=arg
+  when '--skip-iomodule-check'
+    skipIomoduleCheck=true
   end
 end
 
@@ -148,7 +156,7 @@ elsif pciBusIds != ""
   checkValidDevices(pciBusIds)
 end
 
-if checkIoModule
+if ! skipIomoduleCheck && checkIoModule
   abort("There seems to be an iomemory module loaded: #{checkIoModule}, aborting")
 # else
 #  abort("testing!")
@@ -184,16 +192,18 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "scripts/pre_prep.sh"
   config.vm.provision "shell", path: "scripts/prep_host.sh"
   config.vm.provision :reload
-  if not haltProvisioning
-      config.vm.provision "shell", path: "scripts/setup_module.sh"
-      config.vm.provision "shell", path: "scripts/build_package.sh"
-      # test package install?
-      config.vm.provision "shell", path: "scripts/install_fio_tools.sh"
+  if not haltAfterBaseProvisioning
+    config.vm.provision "shell", path: "scripts/setup_module.sh"
+    config.vm.provision "shell", path: "scripts/build_package.sh"
+    # test package install?
+    config.vm.provision "shell", path: "scripts/install_fio_tools.sh"
+    if not haltBeforeTesting
       config.vm.provision "shell", path: "scripts/setup_filesystem.sh"
       config.vm.provision "shell", path: "scripts/test_tgz.sh"
       config.vm.provision "shell", path: "scripts/test_page_cache.sh"
       config.vm.provision "shell", path: "scripts/test_fio.sh"
       config.vm.provision "shell", path: "scripts/remove_module.sh"
       config.vm.provision "shell", path: "scripts/scrape_errors.sh"
+    end
   end
 end

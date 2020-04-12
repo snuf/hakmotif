@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+
 set -x
 
 kb() {
@@ -49,6 +49,10 @@ install_headers() {
 }
 
 mc config host add s3 "$MC_ENDPOINT" "$MC_ACCESS" "$MC_SECRET" --api "$MC_APIVER"
+if [ "$?" != "0" ]; then
+  echo "Failed to setup mc"
+  exit 1
+fi
 install_headers
 
 mkdir -p staging

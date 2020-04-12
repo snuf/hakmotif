@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+
 set -x
 
 git clone ${module_repo}/${module_project}
