@@ -4,7 +4,7 @@
 echo "PHASE 4 START" >> /var/log/fio_test.log
 SECONDS=0
 umount /mnt
-rmmod iomemory-vsl.ko
+rmmod $module_project.ko
 dmesg
 count=$(lsmod | grep iomemory | wc -l)
 if [ "$?" == "0" ]; then

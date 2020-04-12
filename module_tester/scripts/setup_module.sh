@@ -13,22 +13,23 @@ if [ "$running_kernel" != "$kernel_branch" -a "$kernel_branch" != "" ]; then
     exit 1
 fi
 
-if [ ! -d "iomemory-vsl" ]; then
-    git clone https://github.com/snuf/iomemory-vsl
+if [ ! -d "$module_project" ]; then
+    git clone $module_repo/$module_project
 fi
-cd iomemory-vsl
+cd $module_project
 git checkout $module_branch
-cd root/usr/src/iomemory-vsl-3.2.16
+loc=$(ls -1 $module_sub)
+cd $module_sub/$loc
 make
 if [ "$?" == "0" ]; then
     set +e
-    lsmod | grep iomemory_vsl
+    lsmod | grep $module_project
     if [ "$?" == "0" ]; then
         set -e
         echo "Module already loaded, assuming trial"
     else
         set -e
-        insmod iomemory-vsl.ko
+        insmod $module_project.ko
         fios=$(ls -1 /sys/block | grep fio)
         for fio in $fios; do
             echo noop > /sys/block/${fio}/queue/scheduler

@@ -30,7 +30,7 @@ for size in 4 8 16 256; do
                 --rw=$rw \
                 --bs=${size}k \
                 --direct=$direct \
-                $fio_defaults
+                $fio_defaults | tee 
         done
     done
 done

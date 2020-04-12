@@ -9,10 +9,12 @@ default_ns="192.168.86.1"
 default_proxy="http://${default_ns}:8080/"
 
 AptProxy() {
-  proxy=${1:-$default_proxy}
-  if [ "$proxy" != "" ]; then
-    echo "Acquire::http::Proxy \"$proxy\";" > /etc/apt/apt.conf.d/01proxy
-  fi 
+  if "$enable_proxy" != "true" ]; then
+    proxy=${1:-$default_proxy}
+    if [ "$proxy" != "" ]; then
+      echo "Acquire::http::Proxy \"$proxy\";" > /etc/apt/apt.conf.d/01proxy
+    fi
+  fi
 }
 
 ArchResolvFix() {

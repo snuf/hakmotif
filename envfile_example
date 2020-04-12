@@ -1,10 +1,13 @@
-apt_proxy=   # An apt proxy, can limit bandwith with lots of testing
-nameserver=  # If you have want to override the nameserver
-             # - useful with vagrant...
+enable_proxy=false    # Disables the use of the apt proxy
+apt_proxy=            # An apt proxy, can limit bandwith with lots of testing
+nameserver=           # If you have want to override the nameserver
+                      # - useful with vagrant...
 
-module_repo=https://github.com/snuf
-module_project=iomemory-vsl
-module_branch=next_generation  # Which branch to checkout and work with
+module_repo=https://github.com/snuf # module repository
+module_project=iomemory-vsl      # module project
+module_sub=root/usr/src          # source directory the module code has a home under
+                                 # this is ${module-project}-some.version
+module_branch=next_generation    # Which branch to checkout and work with
 module_loc=debs                  # Where to upload generated packages
 kernel_branch=5.6-rc6            # What kernel branch use on supported systems
 subs=debian                      # Unused ?

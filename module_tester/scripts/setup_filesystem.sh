@@ -30,27 +30,53 @@ if [ "$dev" == "" ]; then
     exit 3
 fi
 
-# fioa   252:0    0  298G  0 disk
-lsblk | grep ${dev}1
-if [ "$?" != "0" ]; then
-    echo "no partition found on ${dev}1, creating"
-    parted -s /dev/$dev mklabel gpt
-    parted -s /dev/$dev mkpart primary 1 100%
-    mkfs.ext4 /dev/${dev}1
+# check if there is an active LVM partition
+blkid | grep ${dev} | grep "LVM2_member"
+if [ "$?" == "0" ]; then
+  vg=$(pvs | grep ${dev} | awk '{print $2}')
+  if [ "$vg" != "" ];
+    vgchange --activate y $vg
     if [ "$?" != "0" ]; then
-        echo "failed to create partiion, ${dev}1 not found"
-        exit 1
+      echo "failed to activate $vg"
+      exit 6
     fi
+    lv=$(lsblk -l $dev | tail -1 | grep lvm | awk '{ print $1}')
+    if [ "$lv" != "" ]; then
+      mount /dev/mapper/$lv /mnt
+      if [ "$?" != "0" ];then
+        echo "failed to mount $lv on /mnt"
+        exit 7
+      fi
+    else
+      echo "no Logical Volume found on $vg"
+      exit 4
+  else
+    echo "no Volume Group found on LVM2 device $dev"
+    exit 5
+  fi
+# check if there is an active ext4 partition, otherwise NUKE IT
 else
-    echo "partition found on ${dev}1"
-    file -sL /dev/${dev}1 | grep ext4
-    if [ "$?" != "0" ]; then
-        echo "no ext4 found, formatting"
-        mkfs.ext4 /dev/${dev}1
-    fi
+  lsblk | grep ${dev}1
+  if [ "$?" != "0" ]; then
+      echo "no partition found on ${dev}1, creating"
+      parted -s /dev/$dev mklabel gpt
+      parted -s /dev/$dev mkpart primary 1 100%
+      mkfs.ext4 /dev/${dev}1
+      if [ "$?" != "0" ]; then
+          echo "failed to create partiion, ${dev}1 not found"
+          exit 1
+      fi
+  else
+      echo "partition found on ${dev}1"
+      file -sL /dev/${dev}1 | grep ext4
+      if [ "$?" != "0" ]; then
+          echo "no ext4 found, formatting"
+          mkfs.ext4 /dev/${dev}1
+      fi
 
+  fi
+  mount /dev/${dev}1 /mnt
 fi
-mount /dev/${dev}1 /mnt
 
 delta=$SECONDS
 echo "PHASE 2 END: $delta" >> /var/log/fio_test.log

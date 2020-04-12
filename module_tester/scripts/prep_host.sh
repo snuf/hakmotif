@@ -54,7 +54,7 @@ curl -o /usr/local/bin/mc \
     https://dl.minio.io/client/mc/release/linux-amd64/mc && \
     chmod +x /usr/local/bin/mc
 
-mc config host add s3 $MC_ENDPOINT $MC_ACCESS $MC_SECRET $MC_APIVER
+mc config host add s3 $MC_ENDPOINT $MC_ACCESS $MC_SECRET --api $MC_APIVER
 cps3() {
     loc=$1
     match=$2

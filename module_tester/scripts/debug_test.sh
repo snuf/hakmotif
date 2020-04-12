@@ -3,15 +3,16 @@
 #
 set -x
 sudo umount /mnt
-sudo rmmod iomemory-vsl
+sudo rmmod $module_project
 set -e
 cd ~
-cd iomemory-vsl/root/usr/src/iomemory-vsl-3.2.16
+cd $module_project
+loc=$(ls -1 $module_sub)
+cd $module_sub/$loc
 make clean
 make
-sudo insmod iomemory-vsl.ko
+sudo insmod $module_project.ko
 sudo mount /dev/fioa1 /mnt
 cd ~
 sudo bash scripts/test_page_cache.sh
 sudo bash scripts/test_tgz.sh
-

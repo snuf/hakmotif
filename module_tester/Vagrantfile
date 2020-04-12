@@ -117,6 +117,7 @@ boxParam="generic/opensuse15"
 boxParam='archlinux/archlinux'
 boxParam='fedora/31-cloud-base'
 boxParam='generic/debian10'
+boxParam='generic/ubuntu1910'
 haltAfterBaseProvisioning=false
 haltBeforeTesting=false
 skipSelection=true
@@ -158,8 +159,9 @@ end
 
 if ! skipIomoduleCheck && checkIoModule
   abort("There seems to be an iomemory module loaded: #{checkIoModule}, aborting")
-# else
-#  abort("testing!")
+else
+  puts("Skipping module check")
+  # abort("testing!")
 end
 
 cpus = 8
