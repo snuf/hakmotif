@@ -1,13 +1,14 @@
 #!/bin/bash -xe
 #
 #
-echo "PHASE 3 START" >> /var/log/fio_test.log
-SECONDS=0
 source envfile
 source local_envs.sh
 
-if [ ! -d "/mnt/fio" ]; then
-    mkdir /mnt/fio
+echo "PHASE 3.2 START" >> /var/log/fio_test.log
+SECONDS=0
+
+if [ ! -d "${test_dir}" ]; then
+    mkdir ${test_dir}
 fi
 
 fio_defaults="--ioengine=libaio \
@@ -18,7 +19,7 @@ fio_defaults="--ioengine=libaio \
     --group_reporting \
     --verify_state_save=1 \
     --do_verify=1 \
-    --directory=/mnt/fio"
+    --directory=${test_dir}"
 
 for size in 4 8 16 256; do
     for rw in randwrite write; do
@@ -30,11 +31,11 @@ for size in 4 8 16 256; do
                 --rw=$rw \
                 --bs=${size}k \
                 --direct=$direct \
-                $fio_defaults | tee 
+                $fio_defaults | tee
         done
     done
 done
 # I hope this bails on failure
 
 delta=$SECONDS
-echo "PHASE 3 END: $delta" >> /var/log/fio_test.log
+echo "PHASE 3.2 END: $delta" >> /var/log/fio_test.log

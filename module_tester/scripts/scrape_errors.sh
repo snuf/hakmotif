@@ -1,6 +1,11 @@
 #!/bin/bash
 #
 #
+source envfile
+source local_envs.sh
+
+echo "PHASE 4.1 START" >> /var/log/fio_test.log
+SECONDS=0
 
 out=$(dmesg | \
     egrep "errors|warnings|BUG|stack_dump|OOPS|RIP" | \
@@ -21,3 +26,6 @@ else
     echo "Clean"
     exit 0
 fi
+
+delta=$SECONDS
+echo "PHASE 4.1 END: $delta" >> /var/log/fio_test.log

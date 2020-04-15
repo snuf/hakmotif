@@ -1,10 +1,12 @@
-#!/bin/bash -xe
+#!/bin/bash -x
 #
 #
-echo "PHASE 2 START" >> /var/log/fio_test.log
-SECONDS=0
 source envfile
 source local_envs.sh
+
+echo "PHASE 2 START" >> /var/log/fio_test.log
+SECONDS=0
+
 
 # 00:04.0 Mass storage controller: SanDisk ioDimm3 (rev 01)
 lspci | grep SanDisk
@@ -39,22 +41,23 @@ fi
 blkid | grep ${dev} | grep "LVM2_member"
 if [ "$?" == "0" ]; then
   vg=$(pvs | grep ${dev} | awk '{print $2}')
-  if [ "$vg" != "" ];
+  if [ "$vg" != "" ]; then
     vgchange --activate y $vg
     if [ "$?" != "0" ]; then
       echo "failed to activate $vg"
       exit 6
     fi
-    lv=$(lsblk -l $dev | tail -1 | grep lvm | awk '{ print $1}')
+    lv=$(lsblk -l /dev/$dev | tail -1 | grep lvm | awk '{ print $1 }')
     if [ "$lv" != "" ]; then
-      mount /dev/mapper/$lv /mnt
+      mount /dev/mapper/$lv ${test_mnt}
       if [ "$?" != "0" ];then
-        echo "failed to mount $lv on /mnt"
+        echo "failed to mount $lv on ${test_mnt}"
         exit 7
       fi
     else
       echo "no Logical Volume found on $vg"
       exit 4
+    fi
   else
     echo "no Volume Group found on LVM2 device $dev"
     exit 5
@@ -80,7 +83,11 @@ else
       fi
 
   fi
-  mount /dev/${dev}1 /mnt
+  mount /dev/${dev}1 ${test_mnt}
+fi
+
+if [ ! -d "${test_dir}" ]; then
+    mkdir ${test_dir}
 fi
 
 delta=$SECONDS

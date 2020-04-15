@@ -229,6 +229,7 @@ Vagrant.configure("2") do |config|
   end
   config.vm.provision "file", source: "../envfile", destination: "envfile"
   config.vm.provision "file", source: "scripts/local_envs.sh", destination: "local_envs.sh"
+  # Phase 1
   config.vm.provision "shell", path: "scripts/pre_prep.sh"
   config.vm.provision "shell", path: "scripts/prep_host.sh"
   config.vm.provision :reload
@@ -238,10 +239,13 @@ Vagrant.configure("2") do |config|
     # test package install?
     config.vm.provision "shell", path: "scripts/install_fio_tools.sh"
     if not haltBeforeTesting
+      # Phase 2
       config.vm.provision "shell", path: "scripts/setup_filesystem.sh"
+      # Phase 3
       config.vm.provision "shell", path: "scripts/test_tgz.sh"
       config.vm.provision "shell", path: "scripts/test_page_cache.sh"
       config.vm.provision "shell", path: "scripts/test_fio.sh"
+      # Phase 4
       config.vm.provision "shell", path: "scripts/remove_module.sh"
       config.vm.provision "shell", path: "scripts/scrape_errors.sh"
     end

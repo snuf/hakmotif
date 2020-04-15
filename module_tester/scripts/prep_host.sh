@@ -1,11 +1,11 @@
 #!/bin/bash -xe
 #
 #
+source envfile
+source local_envs.sh
 
 echo "PHASE 1 START" > /var/log/fio_test.log
 SECONDS=0
-source envfile
-source local_envs.sh
 
 if [ "$dist" == "debian" ]; then
     export DEBIAN_FRONTEND=noninteractive
@@ -21,6 +21,7 @@ if [ "$dist" == "debian" ]; then
     apt-get install -y gcc make dkms \
       git make fakeroot build-essential fio \
       debhelper libelf-dev python-pip rsync jq procps \
+      colortail \
       kexec-tools alien linux-headers-$(uname -r)
 
     apt -y autoremove && sudo apt -y clean
@@ -97,5 +98,6 @@ if [ "$running_kernel" != "$kernel_branch" -a "$kernel_branch" != "" ]; then
 elif [ "$kernel_branch" == "" ]; then
     echo "Leaving kernel alone."
 fi
+
 delta=$SECONDS
 echo "PHASE 1 END: $delta" >> /var/log/fio_test.log

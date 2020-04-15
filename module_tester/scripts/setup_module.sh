@@ -1,10 +1,11 @@
 #!/bin/bash -xe
 #
 #
-echo "PHASE 1.1 START" >> /var/log/fio_test.log
-SECONDS=0
 source envfile
 source local_envs.sh
+
+echo "PHASE 1.1 START" >> /var/log/fio_test.log
+SECONDS=0
 
 # solve others later
 running_kernel=$(uname -r)
@@ -13,9 +14,11 @@ if [ "$running_kernel" != "$kernel_branch" -a "$kernel_branch" != "" ]; then
     exit 1
 fi
 
-if [ ! -d "$module_project" ]; then
-    git clone $module_repo/$module_project
+## Should do a chekck if it already exists and do appropriate stuff then...
+if [ -d "$module_project" ]; then
+  rm -rf $module_project
 fi
+git clone $module_repo/$module_project
 cd $module_project
 git checkout $module_branch
 if [ "$module_commit_hash" ]; then

@@ -1,10 +1,11 @@
 #!/bin/bash -xe
 #
 #
-echo "PHASE 1.2 START" >> /var/log/fio_test.log
-SECONDS=0
 source envfile
 source local_envs.sh
+
+echo "PHASE 1.2 START" >> /var/log/fio_test.log
+SECONDS=0
 
 opwd=${PWD}
 fioutil="fio-util-3.2.16.1731-1.0.el7.x86_64.rpm"

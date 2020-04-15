@@ -1,9 +1,11 @@
 #!/bin/bash -x
+#
+#
+source envfile
+source local_envs.sh
 
 echo "PHASE 0 START" > /var/log/fio_test.log
 SECONDS=0
-source envfile
-source local_envs.sh
 
 default_ns="192.168.86.1"
 default_proxy="http://${default_ns}:8080/"
