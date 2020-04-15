@@ -10,7 +10,7 @@ RUN if $apt_proxy; then \
 RUN apt-get update
 RUN apt-get install -y sudo
 RUN sudo apt-get install -y gcc gcc-7 \
-  git make fakeroot build-essential \
+  git make fakeroot build-essential rpm \
   debhelper libelf-dev python-pip rsync jq
 RUN sudo apt -y autoremove && sudo apt -y clean
 RUN useradd -m docker && echo "docker:docker" | chpasswd && adduser docker sudo

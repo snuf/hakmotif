@@ -100,13 +100,43 @@ def deviceListUsage()
   end
 end
 
+def usage(opts)
+  puts <<-EOF
+  vagrant [OPTIONS] [CMD]
+
+-h, --help:
+   show help
+
+--pcibusid=[bus id], -p [bus id]:
+  The ID of the pci bus to passthrough, when ommitted a list will be given
+
+--box=[box image], -b [box image]
+  A valid vagrant box image
+
+--halt-after-base-provisioning, -P
+  Stop after the base machine has been setup before components for testing
+  are installed
+
+--halt-before-testing, -T
+  Stop after all components are setup and ready to start testing
+
+--skip-iomodule-check, -s !!DANGER!!
+  Don't check if a module has been inserted locally that looks like our our
+  iomodule. This will crash a host if the module is loaded and gets loaded on
+  the guest.
+
+CMD: The vagrant command to issue; status, up, halt, destroy, etc
+      EOF
+end
+
 opts = GetoptLong.new(
-  [ '--pcibusid', GetoptLong::OPTIONAL_ARGUMENT ],
-  [ '--box', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--help', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--pcibusid', '-p', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--box', '-b', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--force', GetoptLong::OPTIONAL_ARGUMENT ],
-  [ '--halt-after-base-provisioning', GetoptLong::OPTIONAL_ARGUMENT ],
-  [ '--halt-before-testing', GetoptLong::OPTIONAL_ARGUMENT ],
-  [ '--skip-iomodule-check', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--halt-after-base-provisioning', '-P', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--halt-before-testing', '-T', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--skip-iomodule-check', '-s', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--provision', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--debug', GetoptLong::OPTIONAL_ARGUMENT ]
 )
@@ -118,11 +148,20 @@ boxParam='archlinux/archlinux'
 boxParam='fedora/31-cloud-base'
 boxParam='generic/debian10'
 boxParam='generic/ubuntu1910'
+cpus = 8
+memory = 8192
+hostname = "fio.local"
+
 haltAfterBaseProvisioning=false
 haltBeforeTesting=false
 skipSelection=true
 skipIomoduleCheck=false
 pciBusIds=''
+
+if ARGV.empty?
+  puts "Missing arguments (try --help)"
+  exit 0
+end
 
 for arg in ARGV
   case arg
@@ -144,6 +183,9 @@ opts.each do |opt, arg|
     pciBusIds=arg
   when '--skip-iomodule-check'
     skipIomoduleCheck=true
+  when '--help'
+    usage(opts)
+    exit
   end
 end
 
@@ -164,11 +206,7 @@ else
   # abort("testing!")
 end
 
-cpus = 8
-memory = 8192
 box = "#{boxParam}"
-hostname = "fio.local"
-
 Vagrant.configure("2") do |config|
   config.vm.box = box
   config.vm.host_name = hostname

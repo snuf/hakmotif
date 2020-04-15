@@ -31,6 +31,8 @@ if [ "$dev" == "" ]; then
 fi
 
 # check if there is an active LVM partition
+service lvm2-lvmetad stop
+service lvm2-lvmetad start
 blkid | grep ${dev} | grep "LVM2_member"
 if [ "$?" == "0" ]; then
   vg=$(pvs | grep ${dev} | awk '{print $2}')
