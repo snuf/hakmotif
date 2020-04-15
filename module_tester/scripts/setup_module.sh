@@ -35,9 +35,9 @@ if [ "$?" == "0" ]; then
         set -e
         insmod $module_project.ko
         fios=$(ls -1 /sys/block | grep fio)
-        for fio in $fios; do
-            echo noop > /sys/block/${fio}/queue/scheduler
-        done
+        # for fio in $fios; do
+        #    echo noop > /sys/block/${fio}/queue/scheduler
+        # done
     fi
 else
     echo "Something went wrong building!"

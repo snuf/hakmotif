@@ -202,7 +202,7 @@ end
 if ! skipIomoduleCheck && checkIoModule
   abort("There seems to be an iomemory module loaded: #{checkIoModule}, aborting")
 else
-  puts("Skipping module check")
+  STDERR.puts("Skipping module check")
   # abort("testing!")
 end
 
