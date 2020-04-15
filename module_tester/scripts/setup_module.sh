@@ -18,6 +18,10 @@ if [ ! -d "$module_project" ]; then
 fi
 cd $module_project
 git checkout $module_branch
+if [ "$module_commit_hash" ]; then
+  echo 'Checking out $module_commit_hash'
+  git checkout $module_commit_hash
+fi
 loc=$(ls -1 $module_sub)
 cd $module_sub/$loc
 make
