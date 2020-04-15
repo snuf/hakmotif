@@ -4,7 +4,7 @@
 source envfile
 source local_envs.sh
 
-echo "PHASE 4.1 START" >> /var/log/fio_test.log
+echo "PHASE 4.2 START" >> /var/log/fio_test.log
 SECONDS=0
 
 out=$(dmesg | \
@@ -28,4 +28,4 @@ else
 fi
 
 delta=$SECONDS
-echo "PHASE 4.1 END: $delta" >> /var/log/fio_test.log
+echo "PHASE 4.2 END: $delta" >> /var/log/fio_test.log
