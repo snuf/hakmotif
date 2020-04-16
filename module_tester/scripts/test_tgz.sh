@@ -19,7 +19,7 @@ set -x
 #
 getSyslog() {
     set +e
-    tail -100 /var/log/syslog | grep error
+    tail -100 /var/log/syslog | grep error | grep -v libvirtd
     if [ "$?" == "0" ]; then
         echo "broken $0"
         exit 1

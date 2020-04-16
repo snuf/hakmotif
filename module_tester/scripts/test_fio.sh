@@ -36,6 +36,8 @@ for size in 4 8 16 256; do
     done
 done
 # I hope this bails on failure
+# rm -rf ${test_dir}/*
+sync
 
 delta=$SECONDS
 echo "PHASE 3.2 END: $delta" >> /var/log/fio_test.log
