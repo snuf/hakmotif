@@ -142,12 +142,12 @@ opts = GetoptLong.new(
 )
 
 # need to build an option list from this though...
-boxParam="generic/ubuntu1904"
 boxParam="generic/opensuse15"
-boxParam='archlinux/archlinux'
+boxParam='archlinux/archlinux' # kernel compiled with gcc 9.3 but gcc is 9.2 djeez
 boxParam='fedora/31-cloud-base'
 boxParam='generic/debian10'
-boxParam='generic/ubuntu1910'
+# boxParam='fedora/32-beta-cloud-base'  # breaks as the kernel headers are not supplied
+boxParam="generic/ubuntu1910"
 cpus = 8
 memory = 8192
 hostname = "fio.local"
@@ -155,7 +155,7 @@ hostname = "fio.local"
 haltAfterBaseProvisioning=false
 haltBeforeTesting=false
 skipSelection=true
-skipIomoduleCheck=false
+skipIomoduleCheck=true
 pciBusIds=''
 
 if ARGV.empty?
@@ -166,6 +166,7 @@ end
 for arg in ARGV
   case arg
   when 'up'
+      skipIomoduleCheck=false
       skipSelection=false
       checkStatus=true
   end
@@ -224,7 +225,6 @@ Vagrant.configure("2") do |config|
     end
     if #{box}.match(/archlinux/i)
       lv.disk_bus = "virtio"
-      # puts "With arch you have to run 'vagrant provision' after failure"
     end
   end
   config.vm.provision "file", source: "../envfile", destination: "envfile"

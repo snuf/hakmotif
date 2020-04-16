@@ -3,6 +3,8 @@
 source envfile
 source local_envs.sh
 
+set -x
+
 echo "PHASE 4 START" >> /var/log/fio_test.log
 SECONDS=0
 

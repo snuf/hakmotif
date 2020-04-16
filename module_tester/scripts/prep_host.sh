@@ -28,7 +28,8 @@ if [ "$dist" == "debian" ]; then
 elif [[ "$dist" =~ "rhel" ]]; then
     yum upgrade -y
     yum install -y kernel-headers kernel-devel gcc git make dkms fio \
-      jq python2-pip rpm-build mlocate
+      jq rpm-build mlocate
+    #  python2-pip
 elif [[ "$dist" =~ "suse" ]]; then
     # hard code suse for now...
     echo "NETCONFIG_DNS_STATIC_SERVERS=8.8.8.8" >> /etc/sysconfig/network/config
@@ -43,10 +44,8 @@ elif [[ "$dist" =~ "suse" ]]; then
     ln -s /usr/local/bin/mc /usr/bin/mc
     export PATH=$PATH:/usr/local/bin
 elif [[ "$dist" =~ "arch" ]]; then
-    echo "DNS=192.168.86.1" >> /etc/systemd/resolved.conf
-    systemctl daemon-reload
-    systemctl restart systemd-resolved
-    pacman --noconfirm -Syu git rsync gcc make fio jq rpmextract dkms
+    pacman -Syyu
+    pacman --noconfirm -Syu git rsync gcc make fio jq rpmextract dkms man vim
 else
     echo "unsupported os: $dist"
     exit 1

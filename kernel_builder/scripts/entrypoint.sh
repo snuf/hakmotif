@@ -23,7 +23,7 @@ branch() {
     kb=v$kernel_branch
   fi
   gc=$( git checkout $kb )
-  
+
   # translate .y to the real branch
   if [[ $kernel_branch =~ -rc ]]; then
     kb=v$( echo $kernel_branch | sed -e s/-rc/.0-rc/ )
@@ -77,12 +77,12 @@ ver=$(code_ver $kb)
 # Swap these two, first conf and then kernel itself oh well
 j=$(getconf _NPROCESSORS_ONLN)
 if [ "$kern" == "0" ]; then
-  if [[ $ver < $(code_ver 4.8.0) ]]; then
-    make -j$j x86_64_defconfig
-  else
+  # if [[ $ver < $(code_ver 4.8.0) ]]; then
+  #   make -j$j x86_64_defconfig
+  # else
     get_config
     make -j$j olddefconfig
-  fi
+  # fi
   [ "$conf" == "0" ] && mc cp .config s3/$cfg_loc/config-$kb
   make -j$j prepare
   make -j$j deb-pkg
