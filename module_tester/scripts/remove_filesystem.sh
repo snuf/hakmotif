@@ -8,6 +8,14 @@ set -x
 echo "PHASE 4 START" >> /var/log/fio_test.log
 SECONDS=0
 
+
+created=$(dmesg | grep fioinf | egrep "Found device|Creating|Attach succeeded")
+dev=$(echo $created | perl -ne '/device (fio(\w+)):/; print $1')
+if [ "$dev" == "" ]; then
+    echo "No device found"
+    exit 3
+fi
+
 umount $test_mnt
 
 blkid | grep ${dev} | grep "LVM2_member"

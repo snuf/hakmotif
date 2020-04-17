@@ -21,7 +21,7 @@ if [ "$dist" == "debian" ]; then
     apt-get install -y gcc make dkms \
       git make fakeroot build-essential fio \
       debhelper libelf-dev python-pip rsync jq procps \
-      colortail \
+      colortail netdata \
       kexec-tools alien linux-headers-$(uname -r)
 
     apt -y autoremove && sudo apt -y clean

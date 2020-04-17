@@ -11,9 +11,9 @@ out=$(dmesg | \
     egrep "errors|warnings|BUG|stack_dump|OOPS|RIP" | \
     egrep -v "RAS|Opts: errors=remount-ro|urandom warnings|pcspkr")
 if [ -f "/var/log/kern.log" ]; then
-  out+=$(egrep 'IO errors|I/O error|superblock|Error|Aborting|Remounting filesystem read-only' | \
-      egrep -v "dev fd0|RAS" | \
-      /var/log/kern.log)
+  out+=$(cat /var/log/kern.log | \
+      egrep 'IO errors|I/O error|superblock|Error|Aborting|Remounting filesystem read-only' | \
+      egrep -v "dev fd0|RAS")
 else
   out+="\nNo kern.log????"
 fi
