@@ -7,6 +7,8 @@ source local_envs.sh
 echo "PHASE 3.2 START" >> /var/log/fio_test.log
 SECONDS=0
 
+test_dir=${test_location:-/mnt/fio}
+
 if [ ! -d "${test_dir}" ]; then
     mkdir ${test_dir}
 fi

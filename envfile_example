@@ -33,4 +33,4 @@ test_device_pcibusid=   # Device to passthrough and test on with vagrant
 # Only deb derivative boxes can use the compiled kernels for now
 test_box=generic/debian10   # Vagrant box to use for module testing
 test_mnt="/mnt"             # Mountpoint to use for testing
-test_dir="${test_mnt}/fio"  # Directory to use for tests
+test_location="${test_mnt}/fio"  # Directory to use for tests
