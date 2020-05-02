@@ -38,6 +38,7 @@ if [ "$dist" == "debian" ]; then
   virt-sysprep -a ${vmDir}/${imageName} \
     --run-command 'useradd admin && mkdir /home/admin && chown -R admin /home/admin && adduser admin sudo' \
     --ssh-inject admin:file:/home/vagrant/.ssh/id_rsa.pub
+  # This gets wiped everytime... figure out another way to get it on there
   virt-sysprep -a ${vmDir}/${imageName} \
     --run-command 'ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N "" -t rsa'
   virt-sysprep -a ${vmDir}/${imageName} \

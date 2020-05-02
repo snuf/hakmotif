@@ -112,6 +112,7 @@ def usage(opts)
 
 --box=[box image], -b [box image]
   A valid vagrant box image
+  e.g.: generic/opensuse15, archlinux/archlinux, fedora/32-beta-cloud-base, generic/ubuntu1910
 
 --halt-after-base-provisioning, -P
   Stop after the base machine has been setup before components for testing

@@ -45,7 +45,7 @@ elif [[ "$dist" =~ "suse" ]]; then
     export PATH=$PATH:/usr/local/bin
 elif [[ "$dist" =~ "arch" ]]; then
     pacman -Syyu
-    pacman --noconfirm -Syu git rsync gcc make fio jq rpmextract dkms man vim
+    pacman --noconfirm -Syu git gcc make fio jq rpmextract dkms man vim
 else
     echo "unsupported os: $dist"
     exit 1
@@ -55,6 +55,9 @@ curl -o /usr/local/bin/mc \
     chmod +x /usr/local/bin/mc
 
 mc config host add s3 $MC_ENDPOINT $MC_ACCESS $MC_SECRET --api $MC_APIVER
+if [[ "$dist" =~ "arch" ]]; then
+    mc cp s3/binaries/rsync /usr/local/bin/
+fi
 cps3() {
     loc=$1
     match=$2

@@ -20,7 +20,7 @@ fi
 set -x
 set -e
 
-fio_defaults="--ioengine=libaio \
+fio_defaults=" \
     --verify=crc32c \
     --size=1G \
     --numjobs=8 \
@@ -30,6 +30,10 @@ fio_defaults="--ioengine=libaio \
     --verify_state_save=1 \
     --do_verify=1 \
     --directory=${test_dir}"
+
+if [ "$(uname)" == "Linux" ]; then
+    fio_defaults="--ioengine=libaio $fio_defaults"
+fi
 # not direct is the most important thing here....
 #  DirectIO bypasses the page cache
 direct=0
