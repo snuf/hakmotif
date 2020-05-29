@@ -126,6 +126,11 @@ def usage(opts)
   iomodule. This will crash a host if the module is loaded and gets loaded on
   the guest.
 
+--skip-pcibus-check, -S
+  Don't check the PCI bus forwarding, if there is forwarding happening or
+  not or what is forwarded. Nice for restarting VMs as vagrant doesn't 
+  alter a VM, so adding this to a VM that already exists is useless.
+
 CMD: The vagrant command to issue; status, up, halt, destroy, etc
       EOF
 end
@@ -137,6 +142,7 @@ opts = GetoptLong.new(
   [ '--force', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--halt-after-base-provisioning', '-P', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--halt-before-testing', '-T', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--skip-pcibus-check', '-S', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--skip-iomodule-check', '-s', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--provision', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--debug', GetoptLong::OPTIONAL_ARGUMENT ]
@@ -157,6 +163,7 @@ haltAfterBaseProvisioning=false
 haltBeforeTesting=false
 skipSelection=true
 skipIomoduleCheck=true
+skipPciBusCheck=false
 pciBusIds=''
 
 if ARGV.empty?
@@ -185,6 +192,8 @@ opts.each do |opt, arg|
     pciBusIds=arg
   when '--skip-iomodule-check'
     skipIomoduleCheck=true
+  when '--skip-pcibus-check'
+    skipPciBusCheck=true
   when '--help'
     usage(opts)
     exit
@@ -194,10 +203,10 @@ end
 if checkStatus == true
   status=checkVmStatus(boxParam)
 end
-if pciBusIds == "" && skipSelection == false
+if pciBusIds == "" && skipSelection == false && skipPciBusCheck == false
   deviceListUsage
   exit(1)
-elsif pciBusIds != ""
+elsif pciBusIds != "" || ! skipPciBusCheck
   checkValidDevices(pciBusIds)
 end
 

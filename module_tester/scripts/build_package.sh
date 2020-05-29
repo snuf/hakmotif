@@ -9,11 +9,10 @@ SECONDS=0
 
 if [ "$dist" == "debian" ]; then
   cd $module_project
-  dpkg-buildpackage \
-    -rfakeroot --no-check-builddeps --no-sign
+  make dpkg
 elif [ "$dist" == "rhel" ]; then
   cd $module_project
-  rpmbuild -ba fio-driver.spec
+  make rpm
 else
   echo "PHASE 1.3: Packaging on $dist is not suported."
 fi

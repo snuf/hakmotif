@@ -20,7 +20,7 @@ if [ "$dist" == "debian" ]; then
     apt-get install -y sudo
     apt-get install -y gcc make dkms \
       git make fakeroot build-essential fio \
-      debhelper libelf-dev python-pip rsync jq procps \
+      debhelper libelf-dev rsync jq procps \
       colortail netdata \
       kexec-tools alien linux-headers-$(uname -r)
 

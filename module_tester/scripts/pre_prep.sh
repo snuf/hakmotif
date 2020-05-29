@@ -11,7 +11,7 @@ default_ns="192.168.86.1"
 default_proxy="http://${default_ns}:8080/"
 
 AptProxy() {
-  if "$enable_proxy" != "true" ]; then
+  if [ "$enable_proxy" != "true" ]; then
     proxy=${1:-$default_proxy}
     if [ "$proxy" != "" ]; then
       echo "Acquire::http::Proxy \"$proxy\";" > /etc/apt/apt.conf.d/01proxy
@@ -34,7 +34,12 @@ FedoraResolvFix() {
   fi
   systemctl restart NetworkManager
   sleep 4
-  echo "nameserver ${ns}" >> /etc/resolv.conf
+  ResolveConfFix $ns
+}
+
+ResolveConfFix() {
+  ns=${1:-$default_ns}
+  echo "DNS1=${ns}" >> /etc/sysconfig/network-scripts/ifcfg-eth0
 }
 
 if [ "$dist" == "arch" ]; then
@@ -45,6 +50,10 @@ fi
 
 if [ "$orig_dist" == "fedora" ]; then
     FedoraResolvFix $nameserver
+fi
+
+if [ "$orig_dist" == "rhel" -a "$VERSION_ID" == "7" ]; then
+    ResolveConfFix $nameserver
 fi
 
 delta=$SECONDS
