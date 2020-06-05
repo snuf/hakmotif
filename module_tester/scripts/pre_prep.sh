@@ -40,6 +40,7 @@ FedoraResolvFix() {
 ResolveConfFix() {
   ns=${1:-$default_ns}
   echo "DNS1=${ns}" >> /etc/sysconfig/network-scripts/ifcfg-eth0
+  echo "nameserver ${ns}" >> /etc/resolv.conf
 }
 
 if [ "$dist" == "arch" ]; then
