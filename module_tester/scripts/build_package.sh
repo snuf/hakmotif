@@ -11,7 +11,7 @@ set +e
 if [ "$dist" == "debian" ]; then
   cd $module_project
   make dpkg
-  if [ "$?" == "2" ];
+  if [ "$?" == "2" ]; then
     dpkg-buildpackage -rfakeroot --no-check-builddeps --no-sign
   fi
   if [ "$?" != "0" ]; then
