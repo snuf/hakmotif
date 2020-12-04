@@ -52,7 +52,7 @@ code_ver() {
 
 # Check if package exists, if so exit...
 #
-mc config host add s3 $MC_ENDPOINT $MC_ACCESS $MC_SECRET $MC_APIVER
+mc config host add s3 $MC_ENDPOINT $MC_ACCESS $MC_SECRET --api $MC_APIVER
 unpack_kernel
 cd linux-stable
 kb=$(branch $kernel_branch)

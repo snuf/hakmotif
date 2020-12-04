@@ -11,7 +11,7 @@ default_ns="192.168.86.1"
 default_proxy="http://${default_ns}:8080/"
 
 AptProxy() {
-  if [ "$enable_proxy" != "true" ]; then
+  if [ "$enable_proxy" == "true" ]; then
     proxy=${1:-$default_proxy}
     if [ "$proxy" != "" ]; then
       echo "Acquire::http::Proxy \"$proxy\";" > /etc/apt/apt.conf.d/01proxy
@@ -43,9 +43,26 @@ ResolveConfFix() {
   echo "nameserver ${ns}" >> /etc/resolv.conf
 }
 
+
+DebResolveConfFix() {
+  ns=${1:-$default_ns}
+  echo "supersede domain-name-servers $ns;" >> /etc/dhcp/dhclient.conf
+  echo "nameserver ${ns}" >> /etc/resolv.conf
+}
+
 if [ "$dist" == "arch" ]; then
     ArchResolvFix $nameserver
 elif [ "$dist" == "debian" ]; then
+    # proxmox is peculiar about its own hostname, otherwise /etc/pve 
+    # is not mounted
+    if [ -d "/etc/pve" ]; then
+        DebResolveConfFix $nameserver
+        hostsf=/etc/hosts
+        cat $hostsf | egrep -v "127\.0\.1\.1|192\.168|10\.0\." > ${hostsf}.new
+        ip=$(ip addr show dev eth0 | grep "inet " | awk '{ print $2 }' | awk -F\/ '{ print $1 }')
+        echo "${ip} $(hostname) pvelocalhost" >> ${hostsf}.new
+        mv ${hostsf}.new ${hostsf}
+    fi
     AptProxy $apt_proxy
 fi
 

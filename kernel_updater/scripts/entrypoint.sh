@@ -8,7 +8,7 @@ subarg=$2
 subsubarg=$3
 
 if [ "$arg" == update ]; then
-  mc config host add s3 $MC_ENDPOINT $MC_ACCESS $MC_SECRET $MC_APIVER && \
+  mc config host add s3 $MC_ENDPOINT $MC_ACCESS $MC_SECRET --api $MC_APIVER && \
   mc ls s3/ && \
   mc cp s3/$src_loc/$kernel_src_tgz kernel_src.tgz
 
