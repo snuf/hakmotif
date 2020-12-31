@@ -44,6 +44,7 @@ fi
 vagrant \
    --skip-iomodule-check \
    --box=${test_box} \
+   --pool=${pool} \
    --pcibusid=${test_device_pcibusid} \
    up | tee -a $logFile
 echo "$0 - RUNTIME: ${SECONDS}s" | tee -a $logFile

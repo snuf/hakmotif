@@ -131,6 +131,9 @@ def usage(opts)
   not or what is forwarded. Nice for restarting VMs as vagrant doesn't 
   alter a VM, so adding this to a VM that already exists is useless.
 
+--pool
+  Name of the storage pool to use, defaults to default
+
 CMD: The vagrant command to issue; status, up, halt, destroy, etc
       EOF
 end
@@ -145,6 +148,7 @@ opts = GetoptLong.new(
   [ '--skip-pcibus-check', '-S', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--skip-iomodule-check', '-s', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--provision', GetoptLong::OPTIONAL_ARGUMENT ],
+  [ '--pool', GetoptLong::OPTIONAL_ARGUMENT ],
   [ '--debug', GetoptLong::OPTIONAL_ARGUMENT ]
 )
 
@@ -158,6 +162,7 @@ boxParam="generic/ubuntu2004"
 cpus = 8
 memory = 32 * 1024
 hostname = "fio.local"
+pool = "default"
 
 haltAfterBaseProvisioning=false
 haltBeforeTesting=false
@@ -194,6 +199,8 @@ opts.each do |opt, arg|
     skipIomoduleCheck=true
   when '--skip-pcibus-check'
     skipPciBusCheck=true
+  when '--pool'
+    pool=arg
   when '--help'
     usage(opts)
     exit
@@ -226,6 +233,8 @@ Vagrant.configure("2") do |config|
     lv.cpus = cpus
     lv.memory = memory
     # Support for more dynamic things...
+    lv.storage_pool_name = pool
+
     for ios in pciBusIds.split(/,/)
        lv.pci :bus => "0x#{ios}", :slot => '0x00', :function => '0x0'
     end
