@@ -1,4 +1,4 @@
-#!/bin/bas
+#!/bin/bash
 
 source envfile
 source local_envs.sh
@@ -20,7 +20,7 @@ imageUrl="$imageSource/$imageTag/$imageName"
 if [ "$dist" == "debian" ]; then
   sudo apt-get install -y \
     qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils \
-    virt-manager virt-install libguestfs-tools
+    virt-manager virtinst libguestfs-tools
 
   sudo adduser vagrant libvirt
   sudo adduser vagrant kvm
@@ -33,7 +33,7 @@ if [ "$dist" == "debian" ]; then
   virsh pool-start default
   virsh pool-autostart default
 
-  cat /dev/zero | ssh-keygen -q -N ""
+  ssh-keygen -t rsa -N "" -C "default key" -f id_rsa
 
   virt-sysprep -a ${vmDir}/${imageName} \
     --run-command 'useradd admin && mkdir /home/admin && chown -R admin /home/admin && adduser admin sudo' \

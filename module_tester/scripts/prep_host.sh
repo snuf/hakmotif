@@ -30,6 +30,7 @@ if [ "$dist" == "debian" ]; then
       kexec-tools alien ${headers}-$(uname -r)
 
     apt -y autoremove && sudo apt -y clean
+    # sed out the 127.0.0.1 in /etc/netdata/netdata.conf
 elif [[ "$dist" =~ "rhel" ]]; then
     yum upgrade -y
     yum install -y kernel-headers kernel-devel gcc git make dkms fio \
