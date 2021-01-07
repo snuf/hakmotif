@@ -1,4 +1,4 @@
-#!/bin/bash
+a!/bin/bash
 
 source envfile
 source local_envs.sh
@@ -18,26 +18,33 @@ imageName="debian-10-nocloud-amd64-daily-${imageTag}.qcow2"
 imageUrl="$imageSource/$imageTag/$imageName"
 
 if [ "$dist" == "debian" ]; then
-  sudo apt-get install -y \
+  sudo apt-get install --no-install-recommends -y \
     qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils \
     virt-manager virtinst libguestfs-tools
 
-  sudo adduser vagrant libvirt
-  sudo adduser vagrant kvm
+  adduser vagrant libvirt
+  adduser vagrant kvm
   mkdir -p $vmDir
   cd $vmDir
 
   curl -o ${imageName} ${imageUrl}
+  set +e
+  active=$(virsh net-list | grep default | awk '{ print $2 }')
+  set -e
+  if [ "$active" != "active" ]; then
+    virsh net-start default
+  fi
   virsh pool-define-as --name default --type dir --target $vmDir
   virsh pool-build default
   virsh pool-start default
   virsh pool-autostart default
 
-  ssh-keygen -t rsa -N "" -C "default key" -f id_rsa
+  mkdir -p ${HOME}/.ssh
+  ssh-keygen -t rsa -N "" -C "default key" -f ${HOME}/.ssh/id_rsa
 
   virt-sysprep -a ${vmDir}/${imageName} \
     --run-command 'useradd admin && mkdir /home/admin && chown -R admin /home/admin && adduser admin sudo' \
-    --ssh-inject admin:file:/home/vagrant/.ssh/id_rsa.pub
+    --ssh-inject admin:file:${HOME}/.ssh/id_rsa.pub
   # This gets wiped everytime... figure out another way to get it on there
   virt-sysprep -a ${vmDir}/${imageName} \
     --run-command 'ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N "" -t rsa'

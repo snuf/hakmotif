@@ -4,7 +4,7 @@
 source envfile
 source local_envs.sh
 
-echo "PHASE 1 START" > /var/log/fio_test.log
+echo "PHASE 1 START" > /var/log/fio_test_1.log
 SECONDS=0
 
 if [ "$dist" == "debian" ]; then
@@ -13,6 +13,7 @@ if [ "$dist" == "debian" ]; then
 
     echo 'libssl1.0.0:amd64 libssl1.0.0/restart-services string' | \
     sudo debconf-set-selections
+    # Moved to pre_prep
     # if [ "$apt_proxy" != "" ]; then
     #    echo "Acquire::http::Proxy \"$apt_proxy\";" > /etc/apt/apt.conf.d/01proxy
     # fi
@@ -22,12 +23,12 @@ if [ "$dist" == "debian" ]; then
         headers=linux-headers
     fi
     apt-get update
-    apt-get install -y sudo
-    apt-get install -y gcc make dkms \
+    apt-get upgrade -y
+    apt-get install --no-install-recommends -y sudo gcc make dkms \
       git make fakeroot build-essential fio \
       debhelper libelf-dev rsync jq procps \
       colortail netdata \
-      kexec-tools alien ${headers}-$(uname -r)
+      kexec-tools alien ${headers}-$(uname -r) 
 
     apt -y autoremove && sudo apt -y clean
     # sed out the 127.0.0.1 in /etc/netdata/netdata.conf
@@ -108,4 +109,4 @@ elif [ "$kernel_branch" == "" ]; then
 fi
 
 delta=$SECONDS
-echo "PHASE 1 END: $delta" >> /var/log/fio_test.log
+echo "PHASE 1 END: $delta" >> /var/log/fio_test_1.log

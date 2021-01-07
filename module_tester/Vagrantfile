@@ -94,7 +94,7 @@ def deviceListUsage()
     if keys.length != 0
       line = line + ",(" + keys.join(",") + ")"
     end
-    puts("Usage: vagrant --pcibusid=#{line} <command>")
+    puts("Usage: vagrant --pcibusid=#{line} <vagrant command>")
   else
     puts("No Sandisk Mass Storage Controller Found to pass through, aborting")
   end
@@ -102,7 +102,7 @@ end
 
 def usage(opts)
   puts <<-EOF
-  vagrant [OPTIONS] [CMD]
+  vagrant [CMD] [OPTIONS]
 
 -h, --help:
    show help
@@ -264,6 +264,7 @@ Vagrant.configure("2") do |config|
       config.vm.provision "shell", path: "scripts/test_tgz.sh"
       config.vm.provision "shell", path: "scripts/test_page_cache.sh"
       config.vm.provision "shell", path: "scripts/test_fio.sh"
+      config.vm.provision "shell", path: "scripts/docker.sh"
       config.vm.provision "shell", path: "scripts/libvirt_testing.sh"
       # Phase 4
       config.vm.provision "shell", path: "scripts/remove_filesystem.sh"

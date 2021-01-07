@@ -4,7 +4,7 @@
 source envfile
 source local_envs.sh
 
-echo "PHASE 0 START" > /var/log/fio_test.log
+echo "PHASE 0 START" > /var/log/fio_test_0.log
 SECONDS=0
 
 default_ns="192.168.86.1"
@@ -75,4 +75,4 @@ if [ "$orig_dist" == "rhel" -a "$VERSION_ID" == "7" ]; then
 fi
 
 delta=$SECONDS
-echo "PHASE 0 END: $delta" >> /var/log/fio_test.log
+echo "PHASE 0 END: $delta" >> /var/log/fio_test_0.log
