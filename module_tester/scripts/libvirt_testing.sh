@@ -20,7 +20,8 @@ imageUrl="$imageSource/$imageTag/$imageName"
 if [ "$dist" == "debian" ]; then
   sudo apt-get install --no-install-recommends -y \
     qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils \
-    virt-manager virtinst libguestfs-tools
+    virtinst libguestfs-tools
+  sudo apt-get install -y virt-manager
 
   adduser vagrant libvirt
   adduser vagrant kvm

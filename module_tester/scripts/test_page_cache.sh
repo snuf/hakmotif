@@ -22,7 +22,7 @@ set -e
 
 fio_defaults=" \
     --verify=crc32c \
-    --size=1G \
+    --size=8G \
     --numjobs=8 \
     --runtime=60 \
     --warnings-fatal \

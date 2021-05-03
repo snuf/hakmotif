@@ -1,11 +1,11 @@
 # FROM ubuntu:17.04
-FROM alpine
+FROM alpine:latest
 MAINTAINER funs@barred.org
 
 ARG apt_proxy
 
 USER root
-RUN apk --update add git openssh curl bash && \
+RUN apk --update add git openssh curl bash pigz && \
     rm -rf /var/lib/apt/lists/* && \
     rm /var/cache/apk/*
 RUN curl -o /usr/local/bin/mc \

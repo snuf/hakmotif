@@ -29,7 +29,7 @@ getSyslog() {
     set -e
 }
 cd ${test_dir}
-sudo dd if=/dev/zero of=dd_test bs=1M count=2048
+sudo dd if=/dev/zero of=dd_test bs=1M count=8192
 sync
 getSyslog
 sudo tar -zcvf dd_test.tgz dd_test

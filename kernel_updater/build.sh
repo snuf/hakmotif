@@ -10,5 +10,5 @@ ver=$(grep ^kernel_branch ../envfile | awk -F= '{ print $2 }')
 if [ "$ver" == "" ]; then
   ver=$(basename $(pwd))
 fi
-docker build $OPTS -t $ver .
+docker build $OPTS -t kernel_updater:latest .
 # docker rmi $ver

@@ -7,7 +7,7 @@ set -e
 # local later
 unpack_kernel() {
   mc cp s3/$src_loc/$kernel_src_tgz kernel_src.tgz
-  tar -zxvf kernel_src.tgz
+  pigz -dc kernel_src.tgz | tar -xf -
 }
 
 branch() {

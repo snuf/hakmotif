@@ -12,14 +12,16 @@ if [ "$arg" == update ]; then
   mc ls s3/ && \
   mc cp s3/$src_loc/$kernel_src_tgz kernel_src.tgz
 
-  tar -zxf kernel_src.tgz && rm kernel_src.tgz
+  pigz -dc kernel_src.tgz | tar -xf -
+  # tar -zxf kernel_src.tgz && rm kernel_src.tgz
   cd linux-stable
   git checkout master && \
     git reset --hard && \
     git clean -fd && \
     git pull
   cd /
-  tar -zcf kernel_src.tgz linux-stable && \
+  # tar -zcf kernel_src.tgz linux-stable && \
+  tar -cf - linux-stable | pigz -9 > kernel_src.tgz && \
     mc cp kernel_src.tgz  s3/$src_loc/$kernel_src_tgz && \
     rm kernel_src.tgz
 elif [ "$arg" == get ]; then

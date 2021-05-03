@@ -1,19 +1,18 @@
-# FROM ubuntu:17.04
-FROM ubuntu:18.04
+FROM ubuntu:20.10
 MAINTAINER funs@barred.org
 
 ARG apt_proxy
+ARG proxy_enabled
 
 USER root
-RUN if [ "$apt_proxy" ]; then \
+RUN if [[ "$apt_proxy" -a "$proxy_enabled" == "true" ]]; then \
   echo "Acquire::http::Proxy \"$apt_proxy\";" > /etc/apt/apt.conf.d/01proxy; \
   fi 
 RUN apt-get update && apt-get -y upgrade
-RUN apt-get install -y sudo
-RUN sudo apt-get install -y gcc \
+RUN apt-get install -y gcc sudo cpio \
   git make fakeroot build-essential \
   debhelper libelf-dev libssl-dev \
-  bc bison flex kmod cpio rsync
+  bc bison flex kmod tar rsync pigz
 # perf
 RUN apt-get -y install libunwind-dev systemtap-sdt-dev libperl-dev \
   libnuma-dev liblzma-dev libbabeltrace-ctf-dev libiberty-dev \

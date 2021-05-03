@@ -15,7 +15,7 @@ fi
 
 fio_defaults="--ioengine=libaio \
     --verify=crc32c \
-    --size=1G \
+    --size=8G \
     --numjobs=4 \
     --runtime=60 \
     --group_reporting \

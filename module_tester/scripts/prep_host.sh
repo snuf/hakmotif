@@ -27,7 +27,7 @@ if [ "$dist" == "debian" ]; then
     apt-get install --no-install-recommends -y sudo gcc make dkms \
       git make fakeroot build-essential fio \
       debhelper libelf-dev rsync jq procps \
-      colortail netdata \
+      colortail netdata iotop \
       kexec-tools alien ${headers}-$(uname -r) 
 
     apt -y autoremove && sudo apt -y clean
@@ -108,5 +108,7 @@ elif [ "$kernel_branch" == "" ]; then
     echo "Leaving kernel alone."
 fi
 
+sed -i 's/^#X11UseLocalhost yes$/X11UseLocalhost no/g' /etc/ssh/sshd_config
+systemctl restart sshd
 delta=$SECONDS
 echo "PHASE 1 END: $delta" >> /var/log/fio_test_1.log

@@ -38,8 +38,8 @@ if [ "$lvmetad" != "" ]; then
   service lvm2-lvmetad stop
   service lvm2-lvmetad start
 fi
-blkid | grep ${dev} | grep "LVM2_member"
-if [ "$?" == "0" ]; then
+part=$(blkid | grep ${dev} | grep -v EFI | tail -1)
+if [[ $part =~ .*LVM2_member.* ]]; then
   vg=$(pvs | grep ${dev} | awk '{print $2}')
   if [ "$vg" != "" ]; then
     vgchange --activate y $vg
@@ -63,6 +63,9 @@ if [ "$?" == "0" ]; then
     exit 5
   fi
 # check if there is an active ext4 partition, otherwise NUKE IT
+elif [[ $part =~ .*ext4.* ]]; then
+  dev=$(echo $part | perl -ne '/(fio(\w+\d+)):/; print $1')
+  mount /dev/${dev} ${test_mnt}
 else
   lsblk | grep ${dev}1
   if [ "$?" != "0" ]; then
