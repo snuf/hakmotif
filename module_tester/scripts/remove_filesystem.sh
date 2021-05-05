@@ -16,6 +16,7 @@ if [ "$dev" == "" ]; then
     exit 3
 fi
 
+fstrim $test_mnt
 umount $test_mnt
 
 blkid | grep ${dev} | grep "LVM2_member"

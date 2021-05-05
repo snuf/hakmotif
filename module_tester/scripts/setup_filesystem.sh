@@ -49,7 +49,7 @@ if [[ $part =~ .*LVM2_member.* ]]; then
     fi
     lv=$(lsblk -l /dev/$dev | tail -1 | grep lvm | awk '{ print $1 }')
     if [ "$lv" != "" ]; then
-      mount /dev/mapper/$lv ${test_mnt}
+      mount -o discard /dev/mapper/$lv ${test_mnt}
       if [ "$?" != "0" ];then
         echo "failed to mount $lv on ${test_mnt}"
         exit 7
@@ -65,7 +65,7 @@ if [[ $part =~ .*LVM2_member.* ]]; then
 # check if there is an active ext4 partition, otherwise NUKE IT
 elif [[ $part =~ .*ext4.* ]]; then
   dev=$(echo $part | perl -ne '/(fio(\w+\d+)):/; print $1')
-  mount /dev/${dev} ${test_mnt}
+  mount -o discard /dev/${dev} ${test_mnt}
 else
   lsblk | grep ${dev}1
   if [ "$?" != "0" ]; then
@@ -86,7 +86,7 @@ else
       fi
 
   fi
-  mount /dev/${dev}1 ${test_mnt}
+  mount -o discard /dev/${dev}1 ${test_mnt}
 fi
 
 if [ ! -d "${test_dir}" ]; then
