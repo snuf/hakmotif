@@ -102,7 +102,7 @@ end
 
 def usage(opts)
   puts <<-EOF
-  vagrant [CMD] [OPTIONS]
+  vagrant [OPTIONS] [VAGRANT CMD]
 
 -h, --help:
    show help
@@ -134,7 +134,10 @@ def usage(opts)
 --pool
   Name of the storage pool to use, defaults to default
 
-CMD: The vagrant command to issue; status, up, halt, destroy, etc
+VAGRANT CMD: The vagrant command to issue; status, up, halt, destroy, etc
+
+Example:
+vagrant --pcibusid=03 -s --halt-before-testing --box=generic/debian10 up
       EOF
 end
 
@@ -156,8 +159,9 @@ opts = GetoptLong.new(
 boxParam="generic/opensuse15"
 boxParam='archlinux/archlinux' # kernel compiled with gcc 9.3 but gcc is 9.2 djeez
 boxParam='fedora/31-cloud-base'
-boxParam='generic/debian10'
+# boxParam='generic/debian10'
 # boxParam='fedora/32-beta-cloud-base'  # breaks as the kernel headers are not supplied
+# boxParam="generic/ubuntu2010"
 boxParam="generic/ubuntu2010"
 # boxParam="fedora/33-cloud-base"
 cpus = 4

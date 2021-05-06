@@ -37,15 +37,14 @@ if [ "$?" == "0" ]; then
     else
         set -e
         insmod $module_project.ko
-        fios=$(ls -1 /sys/block | grep fio)
-        # for fio in $fios; do
-        #    echo noop > /sys/block/${fio}/queue/scheduler
-        # done
     fi
 else
     echo "Something went wrong building!"
     exit 1
 fi
 
+if [ "$test_user" != "" ]; then
+    chown -R $test_user /home/$test_user
+fi
 delta=$SECONDS
 echo "PHASE 1.1 END: $delta" >> /var/log/fio_test.log
