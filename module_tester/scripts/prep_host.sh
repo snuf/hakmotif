@@ -7,8 +7,20 @@ source local_envs.sh
 echo "PHASE 1 START" > /var/log/fio_test_1.log
 SECONDS=0
 
+# setup serial console
+gr="/etc/default/grub"
+if [ -f "$gr" ]; then
+    line="GRUB_CMDLINE_LINUX=\"console=ttyS0,115200n8 ignore_loglevel\""
+    sed -i "s/GRUB_CMDLINE_LINUX=.*/$line/" $gr
+    update-grub
+    echo "kernel.panic = 60" >> /etc/sysctl.conf
+fi
+
 if [ "$dist" == "debian" ]; then
     export DEBIAN_FRONTEND=noninteractive
+    systemctl enable serial-getty@ttyS0.service
+    systemctl start serial-getty@ttyS0.service
+
     apt install debconf-utils
 
     echo 'libssl1.0.0:amd64 libssl1.0.0/restart-services string' | \
@@ -31,7 +43,9 @@ if [ "$dist" == "debian" ]; then
       kexec-tools alien ${headers}-$(uname -r) 
 
     apt -y autoremove && sudo apt -y clean
-    # sed out the 127.0.0.1 in /etc/netdata/netdata.conf
+    # sed out the 127.0.0.1 in /etc/netdata/netdata.con$f
+    perl -p -i -e 's/127.0.0.1/0.0.0.0/g' /etc/netdata/netdata.conf
+    /etc/init.d/netdata restart
 elif [[ "$dist" =~ "rhel" ]]; then
     yum upgrade -y
     yum install -y kernel-headers kernel-devel gcc git make dkms fio \

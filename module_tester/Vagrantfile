@@ -156,14 +156,13 @@ opts = GetoptLong.new(
 )
 
 # need to build an option list from this though...
-boxParam="generic/opensuse15"
-boxParam='archlinux/archlinux' # kernel compiled with gcc 9.3 but gcc is 9.2 djeez
-boxParam='fedora/31-cloud-base'
+# boxParam="generic/opensuse15"
+# boxParam='archlinux/archlinux' # kernel compiled with gcc 9.3 but gcc is 9.2 djeez
+# boxParam='fedora/31-cloud-base'
 # boxParam='generic/debian10'
 # boxParam='fedora/32-beta-cloud-base'  # breaks as the kernel headers are not supplied
-# boxParam="generic/ubuntu2010"
 boxParam="generic/ubuntu2010"
-# boxParam="fedora/33-cloud-base"
+# boxParam="fedora/34-cloud-base"
 cpus = 4
 memory = 8 * 1024
 hostname = "fio.local"
