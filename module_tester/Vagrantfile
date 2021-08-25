@@ -163,6 +163,7 @@ opts = GetoptLong.new(
 # boxParam='fedora/32-beta-cloud-base'  # breaks as the kernel headers are not supplied
 boxParam="generic/ubuntu2010"
 # boxParam="fedora/34-cloud-base"
+# boxParam="generic/centos8"
 cpus = 4
 memory = 8 * 1024
 hostname = "fio.local"

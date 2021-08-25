@@ -50,6 +50,16 @@ DebResolveConfFix() {
   echo "nameserver ${ns}" >> /etc/resolv.conf
 }
 
+netplanResolveConfFix() {
+    ns=${1:-$default_ns}
+    rm /etc/resolv.conf
+    ln -s /run/systemd/resolve/resolv.conf /etc/resolv.conf
+    netplan set ethernets.eth0.nameservers.addresses=["${ns}"]
+    netplan apply
+    sleep 10
+    ping -c 2 www.google.com
+}
+
 if [ "$dist" == "arch" ]; then
     ArchResolvFix $nameserver
 elif [ "$dist" == "debian" ]; then
@@ -62,7 +72,10 @@ elif [ "$dist" == "debian" ]; then
         ip=$(ip addr show dev eth0 | grep "inet " | awk '{ print $2 }' | awk -F\/ '{ print $1 }')
         echo "${ip} $(hostname) pvelocalhost" >> ${hostsf}.new
         mv ${hostsf}.new ${hostsf}
+    elif [ -d "/etc/netplan" ]; then
+        netplanResolveConfFix $nameserver
     fi
+    
     AptProxy $apt_proxy
 fi
 

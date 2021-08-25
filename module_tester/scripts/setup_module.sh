@@ -9,6 +9,9 @@ SECONDS=0
 
 # solve others later
 running_kernel=$(uname -r)
+if [[ "$kernel_branch" =~ "-rc" ]]; then
+    kernel_branch=$(echo $kernel_branch | perl -ne '/(\d+.\d+)(-rc\d+)/; print $1.".0$2"')
+fi
 if [ "$running_kernel" != "$kernel_branch" -a "$kernel_branch" != "" ]; then
     echo "Grub phase 1 update gone bad, or just kernel install?"
     exit 1
