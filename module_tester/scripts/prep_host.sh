@@ -12,7 +12,11 @@ gr="/etc/default/grub"
 if [ -f "$gr" ]; then
     line="GRUB_CMDLINE_LINUX=\"console=ttyS0,115200n8 ignore_loglevel\""
     sed -i "s/GRUB_CMDLINE_LINUX=.*/$line/" $gr
-    update-grub
+    if [ "$dist" == "rhel" ]; then
+        grub2-mkconfig -o /boot/grub2/grub.cfg
+    else
+        update-grub
+    fi
     echo "kernel.panic = 60" >> /etc/sysctl.conf
 fi
 
